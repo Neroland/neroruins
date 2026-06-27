@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "NeroRuins - multiloader build (Fabric).",
+  "authors": ["${mod_authors}"],
+  "license": "${mod_license}",
+  "accessWidener": "neroruins.accesswidener",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["za.co.neroland.neroruins.fabric.NeroRuinsFabric"],
+    "client": ["za.co.neroland.neroruins.fabric.NeroRuinsFabricClient"]
+  },
+  "mixins": [
+    "neroruins-common.mixins.json",
+    "neroruins.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "minecraft": ">=${minecraft_version}",
+    "java": ">=21",
+    "fabric-api": "*"
+  }
+}
