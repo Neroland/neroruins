@@ -1,3 +1,11 @@
+[![NeroLink App — Beta](https://img.shields.io/badge/NeroLink_App-Now_in_Beta-60d4e8?style=for-the-badge)](https://nerolandmc.net/nerolink/#beta) [![Explore the Neroland ecosystem](https://img.shields.io/badge/Explore-The_Neroland_Ecosystem-1a5a6c?style=for-the-badge)](https://nerolandmc.net/ecosystem/)
+
+> 📱 **NeroLink App Beta — your Neroland world on your phone.** Check energy, alerts and machines live, claim quest rewards and search your storage without logging in. **[Join the beta at nerolandmc.net →](https://nerolandmc.net/nerolink/#beta)**
+>
+> 🌌 **Explore the Neroland ecosystem.** See how NeroRuins fits together with the rest of the Nero mods — every mod, wiki and changelog in one place. **[View the ecosystem at nerolandmc.net →](https://nerolandmc.net/ecosystem/)** · [NeroRuins on the website](https://nerolandmc.net/mods/neroruins/)
+
+---
+
 # NeroRuins
 
 **Explore it, loot it, uncover it — abandoned labs, crashed ships, alien temples and station wrecks that give every world a reason to be landed on.**
@@ -34,7 +42,13 @@ Built on **Neroland Core**, so its progression gates (loot and structure tiering
 
 ## Privacy (POPIA / GDPR)
 
-NeroRuins stores **no personal data by default**. Discovery and vault state, where used, is gameplay progress tied to the world save — never identity data, never keyed by player name. Should any optional telemetry ever be added, it would be anonymous and opt-out, carrying version strings only (never IPs, usernames, UUIDs or world data), and erasable through Core's shared data-erasure hook.
+NeroRuins stores **no personal data by default**. Discovery and vault state, where used, is gameplay progress tied to the world save — never identity data, never keyed by player name.
+
+> **Telemetry notice:** NeroRuins sends anonymous error reports (stack trace + mod/game
+> versions only — never IPs, usernames, UUIDs, or world data) to the developers via Sentry
+> (EU servers) so crashes can be fixed. On by default — opt out any time by setting `telemetryEnabled = false`
+> in `config/neroruins.properties`. Full details:
+> [PRIVACY.md](https://github.com/Neroland/neroruins/blob/main/PRIVACY.md).
 
 ## Why it fits the ecosystem
 
