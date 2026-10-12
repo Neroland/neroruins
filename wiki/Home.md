@@ -3,14 +3,18 @@
 Player- and contributor-facing documentation for **NeroRuins**, part of the
 Neroland ecosystem. Built on **Neroland Core**.
 
-> **Status:** barebones — this mod is scaffolded (version `0.0.1-alpha.1`) but has no gameplay
+> **Status:** skeleton — this mod is scaffolded (version `0.3.0-alpha.1`) but has no gameplay
 > content yet. Pages will grow as features land. Keep this wiki updated alongside code changes
 > (see [`../AGENTS.md`](../AGENTS.md) / [`../CLAUDE.md`](../CLAUDE.md)).
 
 ## Contents
 
-_No feature pages yet._ Add one page per block, item, machine, or system as it is built, and link it
-here. Keep this page as the index.
+- [Expedition Notes (progression & quests)](Expedition-Notes.md) — the milestone gates, the
+  `vault_claimed` world channel, the `relics` tag and the NeroQuests chapter (not completable until
+  structures exist).
+
+Add one page per block, item, machine, or system as it is built, and link it here. Keep this page as
+the index.
 
 ## See also
 

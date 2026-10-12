@@ -1,0 +1,21 @@
+{
+  "chapter.neroruins.expedition_notes.title": "Expedition Notes",
+  "hook.neroruins.reveal_ruin": "Survey map",
+  "hook.neroruins.reveal_ruin.placeholder": "Expedition Notes: a survey map has been reserved for you. Ruins are not charted yet, so it will be drawn once they are.",
+  "hook.neroruins.unlock_log": "Lore entry",
+  "hook.neroruins.unlock_log.placeholder": "Expedition Notes: a data-log entry has been reserved in your archive. The archive opens once ruins exist.",
+  "quest.neroruins.expedition_notes.first_log.desc": "Find a ruin and read one of its data logs. Every expedition starts with a story someone left behind.",
+  "quest.neroruins.expedition_notes.first_log.title": "First Log",
+  "quest.neroruins.expedition_notes.first_vault_world.desc": "Somewhere on this server, someone has claimed a ruin vault for the first time.",
+  "quest.neroruins.expedition_notes.first_vault_world.title": "First Claim",
+  "quest.neroruins.expedition_notes.plundered_worlds.desc": "Fifty vaults of a single ruin type have been claimed across this server. The galaxy is being picked clean.",
+  "quest.neroruins.expedition_notes.plundered_worlds.title": "Plundered Worlds",
+  "quest.neroruins.expedition_notes.puzzle_solver.desc": "Work out a puzzle door and open it yourself.",
+  "quest.neroruins.expedition_notes.puzzle_solver.title": "Puzzle Solver",
+  "quest.neroruins.expedition_notes.relic_hunter.desc": "Bring back three relics from the ruins you explore.",
+  "quest.neroruins.expedition_notes.relic_hunter.title": "Relic Hunter",
+  "quest.neroruins.expedition_notes.temple_cleared.desc": "Help bring down the last guardian of a temple. Anyone who dealt it damage shares the credit.",
+  "quest.neroruins.expedition_notes.temple_cleared.title": "Temple Cleared",
+  "quest.neroruins.expedition_notes.vault_cracked.desc": "Open a locked vault inside a ruin.",
+  "quest.neroruins.expedition_notes.vault_cracked.title": "Vault Cracked"
+}

@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0-alpha.1] - 2026-10-11
+
+Progression seams and a quest pack, ahead of the structures. Requires **Neroland Core 1.15.0**. No
+gameplay content yet: the quests below become completable once ruins, vaults, puzzle doors, guardians
+and relics exist.
+
+### Added
+
+- **NeroQuests quest pack.** Ships chapter `neroruins:expedition_notes` "Expedition Notes", 7 quests
+  (5 player, 2 server-scope world-log), that appears in the quest book when NeroQuests is installed;
+  inert otherwise, no dependency. Quests read the record gates and channel below, plus a
+  `collect_item` on the `neroruins:relics` tag. Rewards are experience, a few plain items and two
+  `mod_hook` rewards.
+- **Record gates** (`data/neroruins/neroland_gates/`, player scope, no `requires`, never checked for
+  access): `first_log`, `first_vault`, `puzzle_solver`, `temple_cleared`, and the hook gates
+  `hook/reveal_ruin` and `hook/unlock_log`.
+- **`progression.RuinMilestones`** — the one place future structure code reports progress:
+  `firstLog` / `firstVault` / `puzzleSolver` / `templeCleared(ServerPlayer)` open the record gates, and
+  `vaultClaimed(server, structureTypeId)` counts claimed vaults per structure type and fires the
+  threshold channel **`neroruins:vault_claimed`** (scope = structure type id, rungs 1 / 10 / 50) on
+  Neroland Core's bus. Counts persist in the new `neroruins:vault_ledger` saved-data store, loaded
+  through Core's crash-safe `SavedDataRecovery`.
+- **`progression.QuestHooks`** — listens on Core's gate events for the two hook gates, delivers to the
+  online player (or on their next join, via each loader's player-join hook) and re-arms the gate.
+  Placeholder effect until the content exists: one translatable chat line per hook. The survey-map
+  (`reveal_ruin`) and lore-archive (`unlock_log`) effects land with the structures.
+- **`lifecycle.ServerState`** — records the running server from each loader's start/stop events so
+  common code reacting to Core events can find it (and forgets it between single-player worlds).
+- Item tag `neroruins:relics` (empty until relic items exist) and the mod's first `en_us.json`.
+- Wiki page [`Expedition-Notes.md`](wiki/Expedition-Notes.md).
+
+### Changed
+
+- Neroland Core pin `1.13.0` → **`1.15.0`** (offline-capable `ProgressionGates.open/close/isOpen` and
+  sourced `ThresholdEvents.fire`); the loader manifests' floor follows it automatically.
+- Privacy: no new personal data. Personal milestones live in Core's player-scope gate store (covered
+  by Core's privacy notes and erasure hook); the vault ledger holds structure type ids and counts
+  only; the channel scope is a structure type, never a player or a position. `PRIVACY.md` notes it.
+
 ## [0.2.0-alpha.1] - 2026-09-24
 
 EMI compatibility. No gameplay, id, tag or config change.

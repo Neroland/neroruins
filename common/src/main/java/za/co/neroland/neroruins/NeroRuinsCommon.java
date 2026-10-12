@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import za.co.neroland.neroruins.config.NeroRuinsConfig;
 import za.co.neroland.neroruins.platform.Services;
+import za.co.neroland.neroruins.progression.QuestHooks;
 import za.co.neroland.neroruins.telemetry.NeroRuinsTelemetry;
 
 /**
@@ -38,5 +39,11 @@ public final class NeroRuinsCommon {
         //    telemetryEnabled=false); stays inert while the build's DSN is the placeholder
         //    (see NeroRuinsTelemetry's PLACEHOLDER_DSN guard).
         NeroRuinsTelemetry.init();
+
+        // 3. Quest-hook listener on Neroland Core's gate events (the `mod_hook` rewards of the
+        //    Expedition Notes quest pack). Pure Core contract: no quest mod is imported. Each loader's
+        //    entry point also forwards server start/stop (lifecycle.ServerState) and player join
+        //    (QuestHooks.onJoin) so a hook that opened while a player was offline is delivered.
+        QuestHooks.init();
     }
 }

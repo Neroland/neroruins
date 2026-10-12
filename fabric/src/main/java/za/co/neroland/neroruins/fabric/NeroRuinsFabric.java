@@ -1,8 +1,12 @@
 package za.co.neroland.neroruins.fabric;
 
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 
 import za.co.neroland.neroruins.NeroRuinsCommon;
+import za.co.neroland.neroruins.lifecycle.ServerState;
+import za.co.neroland.neroruins.progression.QuestHooks;
 
 /** Fabric entry point for NeroRuins. */
 public final class NeroRuinsFabric implements ModInitializer {
@@ -11,5 +15,10 @@ public final class NeroRuinsFabric implements ModInitializer {
     public void onInitialize() {
         NeroRuinsCommon.LOGGER.info("[NeroRuins] Fabric bootstrap");
         NeroRuinsCommon.init();
+
+        // Server lifecycle + player join, forwarded to the loader-agnostic seams in common.
+        ServerLifecycleEvents.SERVER_STARTED.register(ServerState::serverStarted);
+        ServerLifecycleEvents.SERVER_STOPPED.register(server -> ServerState.serverStopped());
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> QuestHooks.onJoin(handler.player));
     }
 }

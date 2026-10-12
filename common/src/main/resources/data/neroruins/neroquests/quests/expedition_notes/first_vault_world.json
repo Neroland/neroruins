@@ -1,0 +1,21 @@
+{
+  "title": "quest.neroruins.expedition_notes.first_vault_world.title",
+  "description": "quest.neroruins.expedition_notes.first_vault_world.desc",
+  "icon": "minecraft:filled_map",
+  "objectives": [
+    {
+      "type": "neroquests:custom_event",
+      "channel": "neroruins:vault_claimed",
+      "direction": "rising",
+      "min_value": 1,
+      "audience": "world"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 100
+    }
+  ],
+  "scope": "server"
+}

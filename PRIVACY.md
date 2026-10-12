@@ -53,7 +53,11 @@ nothing is ever sent before the config — and therefore your choice — has bee
 ## Player data
 
 NeroRuins does not currently store any player data of its own — no player UUIDs, names, positions or
-gameplay records are written to the world save or anywhere else. Neroland Core (a required
+gameplay records are written to the world save or anywhere else. Its progression milestones
+(`neroruins:first_log`, `first_vault`, `puzzle_solver`, `temple_cleared` and the two `hook/` gates) are
+player-scope gates kept in Neroland Core's progression store, which Core's PRIVACY.md covers
+(including erasure). The one store NeroRuins keeps itself, the vault ledger
+(`neroruins:vault_ledger`), holds structure type ids and counts only. Neroland Core (a required
 dependency) documents its own data handling in its own PRIVACY.md.
 
 ## Legal basis and your rights (GDPR / POPIA)

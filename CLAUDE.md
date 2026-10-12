@@ -5,11 +5,15 @@
 ## The mod
 
 - **NeroRuins** — part of the Neroland sci-fi Minecraft mod ecosystem, built on **Neroland Core**.
-  This repository is currently a **barebones multiloader skeleton** (no gameplay content yet); add
+  This repository is currently a **multiloader skeleton** (no gameplay content yet); add
   shared content under `common/` and wire it through each loader entry point.
+- **Progression seams already exist** (`common/.../progression/`): structure code reports milestones
+  through `RuinMilestones` (record gates + the `neroruins:vault_claimed` channel, scope = structure
+  type, never coordinates); `QuestHooks` handles the quest pack's `mod_hook` rewards. The NeroQuests
+  pack under `data/neroruins/neroquests/` is inert data — **never add a dependency on NeroQuests**.
 - Mod id: **`neroruins`** (matches the registry namespace + every loader manifest). Package root:
   `za.co.neroland.neroruins`. Author: **Neroland**.
-- Version: **0.0.1-alpha.1**.
+- Version: **0.3.0-alpha.1**.
 - Targets **MC 26.1.2, 26.2 AND 26.3** on **NeoForge, MinecraftForge/Forge, and Fabric** → the **"9 cells"**.
   **Java 25.** Mappings = official Mojang names (26.x ships de-obfuscated; no Parchment).
 

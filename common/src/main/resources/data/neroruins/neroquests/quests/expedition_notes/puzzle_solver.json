@@ -1,0 +1,22 @@
+{
+  "title": "quest.neroruins.expedition_notes.puzzle_solver.title",
+  "description": "quest.neroruins.expedition_notes.puzzle_solver.desc",
+  "icon": "minecraft:comparator",
+  "objectives": [
+    {
+      "type": "neroquests:gate_open",
+      "gate": "neroruins:puzzle_solver"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 100
+    },
+    {
+      "type": "neroquests:item",
+      "item": "minecraft:redstone",
+      "count": 16
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "title": "quest.neroruins.expedition_notes.first_log.title",
+  "description": "quest.neroruins.expedition_notes.first_log.desc",
+  "icon": "minecraft:writable_book",
+  "objectives": [
+    {
+      "type": "neroquests:gate_open",
+      "gate": "neroruins:first_log"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 50
+    },
+    {
+      "type": "neroquests:mod_hook",
+      "gate": "neroruins:hook/unlock_log"
+    }
+  ]
+}

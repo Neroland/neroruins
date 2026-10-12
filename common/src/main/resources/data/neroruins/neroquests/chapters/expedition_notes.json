@@ -1,0 +1,42 @@
+{
+  "title": "chapter.neroruins.expedition_notes.title",
+  "icon": "minecraft:writable_book",
+  "allow_server_scope": true,
+  "quests": [
+    {
+      "quest": "neroruins:expedition_notes/first_log",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "quest": "neroruins:expedition_notes/vault_cracked",
+      "x": 2,
+      "y": 0
+    },
+    {
+      "quest": "neroruins:expedition_notes/puzzle_solver",
+      "x": 0,
+      "y": 2
+    },
+    {
+      "quest": "neroruins:expedition_notes/temple_cleared",
+      "x": 2,
+      "y": 2
+    },
+    {
+      "quest": "neroruins:expedition_notes/relic_hunter",
+      "x": 4,
+      "y": 1
+    },
+    {
+      "quest": "neroruins:expedition_notes/first_vault_world",
+      "x": 0,
+      "y": 4
+    },
+    {
+      "quest": "neroruins:expedition_notes/plundered_worlds",
+      "x": 2,
+      "y": 4
+    }
+  ]
+}

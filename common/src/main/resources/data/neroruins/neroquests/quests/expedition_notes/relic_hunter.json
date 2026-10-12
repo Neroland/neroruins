@@ -1,0 +1,18 @@
+{
+  "title": "quest.neroruins.expedition_notes.relic_hunter.title",
+  "description": "quest.neroruins.expedition_notes.relic_hunter.desc",
+  "icon": "minecraft:amethyst_shard",
+  "objectives": [
+    {
+      "type": "neroquests:collect_item",
+      "tag": "neroruins:relics",
+      "count": 3
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 150
+    }
+  ]
+}

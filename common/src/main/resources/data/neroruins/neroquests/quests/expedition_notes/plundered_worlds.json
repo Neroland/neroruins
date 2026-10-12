@@ -1,0 +1,24 @@
+{
+  "title": "quest.neroruins.expedition_notes.plundered_worlds.title",
+  "description": "quest.neroruins.expedition_notes.plundered_worlds.desc",
+  "icon": "minecraft:spyglass",
+  "prerequisites": [
+    "neroruins:expedition_notes/first_vault_world"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:custom_event",
+      "channel": "neroruins:vault_claimed",
+      "direction": "rising",
+      "min_value": 50,
+      "audience": "world"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 300
+    }
+  ],
+  "scope": "server"
+}

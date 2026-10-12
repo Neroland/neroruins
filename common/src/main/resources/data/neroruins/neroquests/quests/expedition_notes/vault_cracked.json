@@ -1,0 +1,25 @@
+{
+  "title": "quest.neroruins.expedition_notes.vault_cracked.title",
+  "description": "quest.neroruins.expedition_notes.vault_cracked.desc",
+  "icon": "minecraft:vault",
+  "prerequisites": [
+    "neroruins:expedition_notes/first_log"
+  ],
+  "objectives": [
+    {
+      "type": "neroquests:gate_open",
+      "gate": "neroruins:first_vault"
+    }
+  ],
+  "rewards": [
+    {
+      "type": "neroquests:xp",
+      "amount": 100
+    },
+    {
+      "type": "neroquests:item",
+      "item": "minecraft:lantern",
+      "count": 4
+    }
+  ]
+}
