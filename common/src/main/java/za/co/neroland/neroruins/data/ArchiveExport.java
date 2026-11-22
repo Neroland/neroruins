@@ -26,6 +26,23 @@ public final class ArchiveExport {
         Path output = directory.resolve(player + ".json");
         JsonObject root = new JsonObject();
         root.addProperty("player", player.toString());
+        document(archive, claims, reservations, expeditions).entrySet()
+                .forEach(entry -> root.add(entry.getKey(), entry.getValue()));
+        String json = new GsonBuilder().setPrettyPrinting().create().toJson(root) + "\n";
+        Files.writeString(output, json, StandardCharsets.UTF_8, StandardOpenOption.CREATE,
+                StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE, LinkOption.NOFOLLOW_LINKS);
+        return Path.of(DIRECTORY, output.getFileName().toString());
+    }
+
+    /**
+     * One player's own NeroRuins records as JSON, without their UUID: the archive, vault claims, held vault
+     * rewards and expedition discoveries. The body of both the {@code /neroruins privacy export} file and
+     * Neroland Core's {@code /neroland data exportme}.
+     */
+    public static JsonObject document(Map<String, Long> archive,
+            Map<ClaimLedger.Location, Long> claims, Map<ClaimLedger.Location, ClaimLedger.Reservation> reservations,
+            java.util.List<ExpeditionRecord.Discovery> expeditions) {
+        JsonObject root = new JsonObject();
         JsonObject entries = new JsonObject();
         new TreeMap<>(archive).forEach(entries::addProperty);
         root.add("archive", entries);
@@ -77,10 +94,7 @@ public final class ArchiveExport {
             discoveries.add(entry);
         });
         root.add("expeditions", discoveries);
-        String json = new GsonBuilder().setPrettyPrinting().create().toJson(root) + "\n";
-        Files.writeString(output, json, StandardCharsets.UTF_8, StandardOpenOption.CREATE,
-                StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE, LinkOption.NOFOLLOW_LINKS);
-        return Path.of(DIRECTORY, output.getFileName().toString());
+        return root;
     }
 
     public static void erase(Path worldRoot, UUID player) throws IOException {

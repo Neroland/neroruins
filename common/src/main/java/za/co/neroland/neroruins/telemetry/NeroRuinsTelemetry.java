@@ -10,11 +10,16 @@ import java.util.regex.Pattern;
 import org.apache.logging.log4j.LogManager;
 
 import io.sentry.Breadcrumb;
+import io.sentry.IScopes;
 import io.sentry.ITransaction;
-import io.sentry.Sentry;
+import io.sentry.Scope;
+import io.sentry.Scopes;
+import io.sentry.SentryClient;
 import io.sentry.SentryEvent;
 import io.sentry.SentryLevel;
+import io.sentry.SentryOptions;
 import io.sentry.SpanStatus;
+import io.sentry.UncaughtExceptionHandlerIntegration;
 import io.sentry.protocol.Message;
 import io.sentry.protocol.SentryException;
 import io.sentry.protocol.SentryStackFrame;
@@ -38,6 +43,10 @@ import za.co.neroland.neroruins.platform.Services;
  *       identity, no player names/UUIDs, and OS-account
  *       names are scrubbed from file paths. Remaining payload: stack trace,
  *       mod/MC/loader/OS/Java versions.</li>
+ *   <li><b>Own client, not the global hub:</b> every Nero mod ships the same deduplicated Sentry jar, so a
+ *       global {@code Sentry.init} would replace (and be replaced by) every other mod's. NeroRuins builds its
+ *       own options, client and scopes ({@link #isolatedScopes}) and never calls the static {@code Sentry}
+ *       API.</li>
  *   <li><b>Bounded volume:</b> per-session de-duplication plus a hard cap of
  *       {@value #MAX_EVENTS_PER_SESSION} events per game session.</li>
  * </ul>
@@ -85,6 +94,10 @@ public final class NeroRuinsTelemetry {
             Pattern.compile("(?i)(?:[A-Z]:)?[/\\\\](?:Users|home)[/\\\\][^/\\\\\\s:;,'\"]+");
 
     private static volatile boolean active;
+    /** NeroRuins' own scopes; {@code null} until {@link #start()} succeeds. Never the global hub. */
+    private static volatile IScopes scopes;
+    /** Kept so the handler stays referenced (and ecj sees it owned) for the life of the process. */
+    private static UncaughtExceptionHandlerIntegration uncaughtHandler;
     private static final AtomicInteger eventsSent = new AtomicInteger();
     private static final Set<String> seenFingerprints = ConcurrentHashMap.newKeySet();
     private static SentryLogAppender appender;
@@ -144,25 +157,12 @@ public final class NeroRuinsTelemetry {
         }
         String modVersion = Services.PLATFORM.getModVersion();
         boolean dev = Services.PLATFORM.isDevelopmentEnvironment();
-        Sentry.init(options -> {
-            options.setDsn(DSN);
-            options.setRelease("neroruins@" + modVersion);
-            // Dev/IDE runs report under a dedicated environment so they never mix with real releases.
-            options.setEnvironment(dev ? "development" : environmentOf(modVersion));
-            // POPIA/GDPR: never store the sender's IP address or identity.
-            options.setSendDefaultPii(false);
-            // The machine's hostname is identifying; never attach it.
-            options.setAttachServerName(false);
-            options.setEnableUncaughtExceptionHandler(true);
-            // Release health: session lifecycle managed manually (started below, ended on JVM
-            // shutdown). The session id is random per launch and is NOT linked across sessions.
-            options.setEnableAutoSessionTracking(false);
-            // Performance: sample a small fraction of traced operations. Timing data only — no
-            // personal data in a transaction.
-            options.setTracesSampleRate(0.05D);
-            options.setBeforeSend((event, hint) -> ForeignMixinFailure.matches(event) ? null : filterAndScrub(event));
-        });
-        Sentry.configureScope(scope -> {
+        // Dev/IDE runs report under a dedicated environment so they never mix with real releases.
+        SentryOptions options = baseOptions(modVersion, dev ? "development" : environmentOf(modVersion));
+        options.setBeforeSend((event, hint) -> ForeignMixinFailure.matches(event) ? null : filterAndScrub(event));
+        IScopes own = isolatedScopes(options, "neroruins");
+        scopes = own;
+        own.configureScope(scope -> {
             scope.setTag("loader", Services.PLATFORM.getPlatformName().toLowerCase(Locale.ROOT));
             scope.setTag("dist", Services.PLATFORM.isClient() ? "client" : "dedicated_server");
             scope.setTag("runtime", dev ? "development" : "production");
@@ -185,11 +185,11 @@ public final class NeroRuinsTelemetry {
             }
         });
         // Manual release-health session for this play session; closed on a clean JVM shutdown.
-        Sentry.startSession();
+        own.startSession();
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             try {
-                Sentry.endSession();
-                Sentry.flush(2000L);
+                own.endSession();
+                own.flush(2000L);
             } catch (RuntimeException ignored) {
                 // best-effort flush on shutdown
             }
@@ -205,6 +205,44 @@ public final class NeroRuinsTelemetry {
                         + "telemetryEnabled=false in config/neroruins.properties).");
     }
 
+    /** Options for NeroRuins' own client: the same privacy settings as before, never the global hub's. */
+    static SentryOptions baseOptions(String modVersion, String environment) {
+        SentryOptions options = new SentryOptions();
+        options.setDsn(DSN);
+        options.setRelease("neroruins@" + modVersion);
+        options.setEnvironment(environment);
+        // POPIA/GDPR: never store the sender's IP address or identity.
+        options.setSendDefaultPii(false);
+        // The machine's hostname is identifying; never attach it.
+        options.setAttachServerName(false);
+        options.setEnableUncaughtExceptionHandler(true);
+        // Flushed by NeroRuins' own hook below; never close the shared global hub.
+        options.setEnableShutdownHook(false);
+        // Release health: session lifecycle managed manually (started in start(), ended on JVM
+        // shutdown). The session id is random per launch and is NOT linked across sessions.
+        options.setEnableAutoSessionTracking(false);
+        // Performance: sample a small fraction of traced operations. Timing data only — no
+        // personal data in a transaction.
+        options.setTracesSampleRate(0.05D);
+        return options;
+    }
+
+    /**
+     * Builds isolated scopes bound to a client of NeroRuins' own: what {@code Sentry.init} does, minus the
+     * global hub. The uncaught-exception handler chains to the previous one, so every mod still sees crashes
+     * and keeps only its own through {@code beforeSend}.
+     */
+    static IScopes isolatedScopes(SentryOptions options, String creator) {
+        options.activate();                        // start Sentry's executors, as the global init would
+        Scopes own = new Scopes(new Scope(options), new Scope(options), new Scope(options), creator);
+        own.bindClient(new SentryClient(options));
+        if (options.isEnableUncaughtExceptionHandler()) {
+            uncaughtHandler = new UncaughtExceptionHandlerIntegration();
+            uncaughtHandler.register(own, options);
+        }
+        return own;
+    }
+
     /**
      * Drops a lightweight, non-identifying breadcrumb onto the current scope — a trail of what the
      * mod was doing that rides along with the next error report. No-op when telemetry is off. The
@@ -212,7 +250,8 @@ public final class NeroRuinsTelemetry {
      * given player names, UUIDs or any other player data.
      */
     public static void breadcrumb(String category, String message) {
-        if (!active) {
+        IScopes s = scopes;
+        if (!active || s == null) {
             return;
         }
         Breadcrumb crumb = new Breadcrumb();
@@ -220,7 +259,7 @@ public final class NeroRuinsTelemetry {
         crumb.setCategory(category);
         crumb.setLevel(SentryLevel.INFO);
         crumb.setMessage(scrub(message));
-        Sentry.addBreadcrumb(crumb);
+        s.addBreadcrumb(crumb);
     }
 
     /**
@@ -229,10 +268,11 @@ public final class NeroRuinsTelemetry {
      * Only timing + operation name are recorded — never personal data.
      */
     public static <T> T trace(String operation, String name, java.util.function.Supplier<T> body) {
-        if (!active) {
+        IScopes s = scopes;
+        if (!active || s == null) {
             return body.get();
         }
-        ITransaction tx = Sentry.startTransaction(name, operation);
+        ITransaction tx = s.startTransaction(name, operation);
         try {
             return body.get();
         } catch (RuntimeException | Error e) {
@@ -306,10 +346,11 @@ public final class NeroRuinsTelemetry {
 
     /** Capture an exception already known to touch NeroRuins code. */
     static void capture(Throwable t) {
-        if (!active || t == null) {
+        IScopes s = scopes;
+        if (!active || s == null || t == null) {
             return;
         }
-        Sentry.captureException(t);
+        s.captureException(t);
     }
 
     /** Capture a handled exception if it is still clearly from NeroRuins code. */
@@ -321,20 +362,22 @@ public final class NeroRuinsTelemetry {
 
     /** Capture a handled exception with a non-identifying source label for triage. */
     public static void captureHandledException(Throwable t, String source, String operation) {
-        if (!active || t == null || !touchesNeroRuins(t)) {
+        IScopes s = scopes;
+        if (!active || s == null || t == null || !touchesNeroRuins(t)) {
             return;
         }
-        Sentry.withScope(scope -> {
+        // Tags set inside withScope never reach the event in Sentry 8.x; the ScopeCallback overload does.
+        s.captureException(t, scope -> {
             scope.setTag("handled", "true");
             scope.setTag("source", source);
             scope.setExtra("operation", operation);
-            Sentry.captureException(t);
         });
     }
 
     /** Capture a (scrubbed, truncated) FATAL log line that names NeroRuins without a throwable. */
     static void captureMessage(String message) {
-        if (!active) {
+        IScopes s = scopes;
+        if (!active || s == null) {
             return;
         }
         String scrubbed = scrub(message);
@@ -346,7 +389,7 @@ public final class NeroRuinsTelemetry {
         Message msg = new Message();
         msg.setFormatted(scrubbed);
         event.setMessage(msg);
-        Sentry.captureEvent(event);
+        s.captureEvent(event);
     }
 
     /**

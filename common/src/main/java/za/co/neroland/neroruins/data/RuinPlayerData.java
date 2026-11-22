@@ -5,8 +5,12 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.google.gson.JsonElement;
+
 import net.minecraft.server.MinecraftServer;
+import org.jetbrains.annotations.Nullable;
 import za.co.neroland.nerolandcore.data.PlayerDataErasure;
+import za.co.neroland.nerolandcore.data.PlayerDataExport;
 import za.co.neroland.neroruins.NeroRuinsCommon;
 
 public final class RuinPlayerData {
@@ -26,11 +30,30 @@ public final class RuinPlayerData {
             register(ClaimLedger.erasureStore());
             register(ExpeditionRecord.erasureStore());
             PlayerDataErasure.register(RuinPlayerData::erase);
+            PlayerDataExport.register(NeroRuinsCommon.MOD_ID, RuinPlayerData::coreExport);
         }
     }
 
     public static void register(Store store) {
         STORES.add(store);
+    }
+
+    /**
+     * Core {@code PlayerDataExporter}: the same document as {@code /neroruins privacy export}, read from the
+     * saved stores (so it works for offline players), without the UUID, or {@code null} when NeroRuins holds
+     * nothing for the player. Nothing is logged or written to disk.
+     */
+    @Nullable
+    public static JsonElement coreExport(MinecraftServer server, UUID player) {
+        var archive = PlayerArchive.get(server).export(player);
+        var ledger = ClaimLedger.get(server);
+        var claims = ledger.export(player);
+        var reservations = ledger.exportReservations(player);
+        var expeditions = ExpeditionRecord.get(server).export(player);
+        if (archive.isEmpty() && claims.isEmpty() && reservations.isEmpty() && expeditions.isEmpty()) {
+            return null;
+        }
+        return ArchiveExport.document(archive, claims, reservations, expeditions);
     }
 
     private static void erase(MinecraftServer server, UUID player) {

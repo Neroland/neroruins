@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-22
+
+### Added
+
+- Your NeroRuins records (archive, vault claims, held rewards and Expedition Record) now appear in Neroland Core's
+  `/neroland data exportme` (Core 1.20.1): the same document as `/neroruins privacy export`, without your UUID,
+  for online and offline players, never written to disk.
+
+### Changed
+
+- Builds against Neroland Core 1.20.1 (was 1.19.0), so Core 1.20.1 or later is required.
+
+### Fixed
+
+- Error reports no longer go silent when another mod starts Sentry: NeroRuins now reports through its own
+  isolated Sentry client instead of the shared global one. Same opt-out, filtering and scrubbing; no new data.
+- Handled-exception reports now keep their `handled`/`source` tags (they were set in a way Sentry 8 drops).
+
 ## [0.5.3] - 2026-11-26
 
 ### Added
