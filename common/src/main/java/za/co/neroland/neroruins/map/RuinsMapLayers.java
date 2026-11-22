@@ -19,6 +19,9 @@ public final class RuinsMapLayers {
     public static final Identifier RUINS = id("ruins");
     static final Identifier ICON_RUIN = id("ruin");
     static final Identifier ICON_CLAIMED = id("vault_claimed");
+    /** Direction-only marker towards the holder's Surveyor's Compass target. */
+    public static final Identifier EXPEDITION_TARGET = id("expedition_target");
+    static final Identifier ICON_EXPEDITION_TARGET = id("expedition_target");
 
     private RuinsMapLayers() {
     }

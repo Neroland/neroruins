@@ -101,6 +101,12 @@ public class Sentinel extends Monster {
     }
 
     @Override
+    public void die(DamageSource source) {
+        super.die(source);
+        TempleClearance.onSentinelDeath(this, source);
+    }
+
+    @Override
     protected SoundEvent getAmbientSound() { return SoundEvents.IRON_GOLEM_STEP; }
 
     @Override

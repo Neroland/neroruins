@@ -63,6 +63,10 @@ public final class RuinMilestones {
     /** Record gate: a player helped clear a temple of its guardians. */
     public static final Identifier TEMPLE_CLEARED = id("temple_cleared");
 
+    /** The ruin families that each have a {@code neroruins:discovered/<family>} record gate. */
+    public static final java.util.List<String> FAMILIES = java.util.List.of(
+            "bunker", "survey_lab", "crash_site", "colony_field", "lattice_temple", "halcyon_ark");
+
     /** Threshold channel: vaults claimed in this world, per structure type (scope = structure type id). */
     public static final Identifier VAULT_CLAIMED = id("vault_claimed");
 
@@ -107,6 +111,19 @@ public final class RuinMilestones {
     /** Records that {@code player} helped clear a temple (opens {@link #TEMPLE_CLEARED}). */
     public static void templeCleared(ServerPlayer player) {
         open(player, TEMPLE_CLEARED);
+    }
+
+    /**
+     * The record gate for first entering a ruin family: {@code neroruins:discovered/<family>}, or empty for a
+     * family that has none (a data-pack family, say).
+     */
+    public static java.util.Optional<Identifier> discoveredGate(String family) {
+        return FAMILIES.contains(family) ? java.util.Optional.of(id("discovered/" + family)) : java.util.Optional.empty();
+    }
+
+    /** Records that {@code player} stood inside a ruin hub of {@code family} (opens its {@link #discoveredGate}). */
+    public static void discovered(ServerPlayer player, String family) {
+        discoveredGate(family).ifPresent(gate -> open(player, gate));
     }
 
     /**

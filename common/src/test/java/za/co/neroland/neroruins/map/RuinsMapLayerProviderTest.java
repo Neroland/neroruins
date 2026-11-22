@@ -1,5 +1,6 @@
 package za.co.neroland.neroruins.map;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -24,6 +25,8 @@ import za.co.neroland.nerolandcore.map.MapQueryResult;
 import za.co.neroland.nerolandcore.map.MapViewer;
 import za.co.neroland.neroruins.data.ClaimLedger;
 import za.co.neroland.neroruins.data.ExpeditionRecord;
+import za.co.neroland.neroruins.expedition.Bearing;
+import za.co.neroland.neroruins.expedition.RelicPassives;
 
 /**
  * The ruins layer shows only the viewer's own discovered hubs: Core's conformance fixture with two viewers, a
@@ -57,6 +60,19 @@ class RuinsMapLayerProviderTest {
     private static final class Store implements RuinsMapSource {
         final Map<UUID, List<ExpeditionRecord.Discovery>> discoveries = new HashMap<>();
         final Map<UUID, List<ClaimLedger.Location>> claims = new HashMap<>();
+        /** A compass target's true position per holder; the source reduces it to point and band. */
+        final Map<UUID, long[]> compassTargets = new HashMap<>();
+        String compassDimension = OVERWORLD_ID;
+
+        @Override
+        public Optional<RelicPassives.CompassReading> compass(MapViewer viewer) {
+            long[] target = compassTargets.get(viewer.id());
+            if (target == null || !viewer.online() || viewer.position().isEmpty()) return Optional.empty();
+            long dx = target[0] - viewer.position().get().getX();
+            long dz = target[1] - viewer.position().get().getZ();
+            return Optional.of(new RelicPassives.CompassReading(compassDimension, Bearing.point(dx, dz),
+                    Bearing.band(dx, dz)));
+        }
 
         @Override
         public List<ExpeditionRecord.Discovery> discoveries(MapViewer viewer) {
@@ -87,7 +103,10 @@ class RuinsMapLayerProviderTest {
 
     @Test
     void passesCoreConformance() {
-        MapLayerConformance.create(new RuinsMapLayerProvider(seeded()))
+        Store store = seeded();
+        store.compassTargets.put(ENTITLED, new long[] {300, -310});
+        store.compassTargets.put(THIRD, new long[] {-300, 310});
+        MapLayerConformance.create(new RuinsMapLayerProvider(store))
                 .viewers(online(ENTITLED, 0, 0), online(STRANGER, 4, 0))
                 .dimensions(OVERWORLD, MOON)
                 .bounds(MapBounds.around(0, 0, 512))
@@ -95,6 +114,7 @@ class RuinsMapLayerProviderTest {
                 .forbiddenIds(THIRD)
                 .forbiddenText("Trudy")
                 .expectEntitledSees(RuinsMapLayers.RUINS, 2)
+                .expectEntitledSees(RuinsMapLayers.EXPEDITION_TARGET, 1)
                 .verify();
     }
 
@@ -131,5 +151,60 @@ class RuinsMapLayerProviderTest {
                 .markers().isEmpty());
         MapViewer offline = MapViewer.forTest(ENTITLED, null, null, null);
         assertEquals(2, query(store, offline, OVERWORLD, MapBounds.around(0, 0, 512)).markers().size());
+    }
+
+    private static List<MapMarker> targetMarkers(MapQueryResult result) {
+        return result.markers().stream().filter(m -> RuinsMapLayers.EXPEDITION_TARGET.equals(m.layer())).toList();
+    }
+
+    @Test
+    void twoTargetsInTheSameSectorAndBandDrawTheSameMarker() {
+        Store a = new Store();
+        a.compassTargets.put(ENTITLED, new long[] {300, -310});
+        Store b = new Store();
+        b.compassTargets.put(ENTITLED, new long[] {520, -480});
+        MapBounds bounds = MapBounds.around(0, 0, 512);
+        List<MapMarker> first = targetMarkers(query(a, online(ENTITLED, 0, 0), OVERWORLD, bounds));
+        List<MapMarker> second = targetMarkers(query(b, online(ENTITLED, 0, 0), OVERWORLD, bounds));
+        assertEquals(1, first.size());
+        assertEquals(first, second, "only the compass point and band reach the map");
+        MapMarker marker = first.get(0);
+        assertEquals(68, marker.x(), "96 blocks along the north-east sector centre");
+        assertEquals(-68, marker.z());
+    }
+
+    @Test
+    void aCloseTargetIsStillDrawnAtTheFixedDistance() {
+        Store store = new Store();
+        store.compassTargets.put(ENTITLED, new long[] {0, -10});
+        MapMarker marker = targetMarkers(query(store, online(ENTITLED, 0, 0), OVERWORLD,
+                MapBounds.around(0, 0, 512))).get(0);
+        assertEquals(0, marker.x());
+        assertEquals(-RuinsMapLayerProvider.TARGET_MARKER_DISTANCE, marker.z(), "never pinned closer than 96");
+    }
+
+    @Test
+    void theTargetMarkerNeedsAnOnlineHolderInTheCompassWorld() {
+        Store store = new Store();
+        store.compassTargets.put(ENTITLED, new long[] {500, 500});
+        MapBounds bounds = MapBounds.around(0, 0, 512);
+        assertTrue(targetMarkers(query(store, MapViewer.forTest(ENTITLED, null, null, null), OVERWORLD, bounds))
+                .isEmpty(), "offline viewers get no bearing");
+        assertTrue(targetMarkers(query(store, online(STRANGER, 0, 0), OVERWORLD, bounds)).isEmpty(),
+                "another player's compass is never shown");
+        assertTrue(targetMarkers(query(store, online(ENTITLED, 0, 0), MOON, bounds)).isEmpty(),
+                "not in another world");
+        store.compassDimension = "maptest:moon";
+        assertTrue(targetMarkers(query(store, online(ENTITLED, 0, 0), OVERWORLD, bounds)).isEmpty(),
+                "a target in another world draws nothing here");
+    }
+
+    @Test
+    void sectorOffsets() {
+        assertArrayEquals(new int[] {0, -96}, RuinsMapLayerProvider.targetOffset("n"));
+        assertArrayEquals(new int[] {96, 0}, RuinsMapLayerProvider.targetOffset("e"));
+        assertArrayEquals(new int[] {-68, 68}, RuinsMapLayerProvider.targetOffset("sw"));
+        assertArrayEquals(new int[] {0, 0}, RuinsMapLayerProvider.targetOffset("here"));
+        assertEquals(null, RuinsMapLayerProvider.targetOffset("up"));
     }
 }

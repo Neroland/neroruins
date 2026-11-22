@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.3] - 2026-11-26
+
+### Added
+
+- A `neroruins:expedition_target` map layer: while you hold a Surveyor's Compass, the map shows a bearing marker
+  in the compass's direction. It is drawn at a fixed distance along the compass point, with the distance band as a
+  detail, so it is never more precise than the compass's own reading. Only you see it, and only while you are
+  online and holding the compass.
+- Record gates `neroruins:discovered/<family>` (bunker, survey lab, crash site, colony field, lattice temple,
+  Halcyon Ark), opened the first time you stand inside a ruin of that family. Players who explored earlier are
+  credited the next time they enter one.
+- The `neroruins:temple_cleared` record gate is now opened: when the last guardian of a Lattice Temple falls and
+  every Ruin Spawner in it is spent, the player who landed the blow and every survival or adventure player inside
+  the temple are credited. Nothing new is stored.
+
 ## [0.5.2] - 2026-11-21
 
 ### Changed

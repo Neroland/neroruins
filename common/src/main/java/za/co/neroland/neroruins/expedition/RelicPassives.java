@@ -1,11 +1,11 @@
 package za.co.neroland.neroruins.expedition;
 
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -64,7 +64,15 @@ public final class RelicPassives {
 
     private record Target(String dimension, Optional<RuinLocator.Found> found, long computedAt) { }
 
-    private static final Map<UUID, Target> COMPASS = new HashMap<>();
+    // Concurrent: map layers may read it off the server thread (see compassReading).
+    private static final Map<UUID, Target> COMPASS = new ConcurrentHashMap<>();
+
+    /**
+     * A coarse Surveyor's Compass reading: the world the cached target is in, one of the eight compass points
+     * (or {@code here}) and a distance band, exactly as precise as the in-game action bar. The target's true
+     * position never leaves this class.
+     */
+    public record CompassReading(String dimension, String point, String band) { }
 
     private RelicPassives() { }
 
@@ -81,6 +89,20 @@ public final class RelicPassives {
             case "resonance_heart" -> Passive.REPAIR;
             default -> null;
         });
+    }
+
+    /**
+     * The compass reading for a holder at {@code (x, z)}, if they are holding a Surveyor's Compass and it has a
+     * target. Read-only and memory-only: empty once the compass is put away or the holder leaves.
+     */
+    public static Optional<CompassReading> compassReading(UUID player, long x, long z) {
+        if (player == null) return Optional.empty();
+        Target target = COMPASS.get(player);
+        if (target == null || target.found().isEmpty()) return Optional.empty();
+        RuinLocator.Found found = target.found().get();
+        long dx = found.x() - x;
+        long dz = found.z() - z;
+        return Optional.of(new CompassReading(target.dimension(), Bearing.point(dx, dz), Bearing.band(dx, dz)));
     }
 
     /** Regrowth only helps a holder below half health. */

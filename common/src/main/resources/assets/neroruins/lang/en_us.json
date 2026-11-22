@@ -433,5 +433,7 @@
   "gui.neroruins.relic_socket.returned": "The socket reads the relic and releases it back to you.",
   "gui.neroruins.vault.status.7": "Another explorer opened this vault first. It has been claimed.",
   "map.layer.neroruins.ruins": "Ruins",
-  "map.neroruins.ruin.claimed": "Vault claimed"
+  "map.neroruins.ruin.claimed": "Vault claimed",
+  "map.layer.neroruins.expedition_target": "Expedition bearing",
+  "map.neroruins.expedition_target": "Surveyor's Compass bearing"
 }

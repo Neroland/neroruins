@@ -16,6 +16,7 @@ import za.co.neroland.neroruins.NeroRuinsCommon;
 import za.co.neroland.neroruins.config.NeroRuinsConfig;
 import za.co.neroland.neroruins.data.ClaimLedger;
 import za.co.neroland.neroruins.data.ExpeditionRecord;
+import za.co.neroland.neroruins.progression.RuinMilestones;
 import za.co.neroland.neroruins.worldgen.structure.ComplexHub;
 
 /**
@@ -70,6 +71,9 @@ public final class ExpeditionTracker {
             /*Identifier id = level.registryAccess().registryOrThrow(Registries.STRUCTURE).getKey(hub);
             *///?}
             if (id == null) continue;
+            // Record gate per family; opening an open gate is a no-op, so re-entering credits players who
+            // explored before the gate existed.
+            RuinMilestones.discovered(player, hub.family());
             BlockPos centre = start.getBoundingBox().getCenter();
             Optional<ExpeditionRecord.Hub> position = NeroRuinsConfig.RECORD_POSITIONS.get()
                     ? Optional.of(new ExpeditionRecord.Hub(centre.getX(), centre.getY(), centre.getZ()))

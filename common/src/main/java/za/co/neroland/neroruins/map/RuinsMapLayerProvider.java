@@ -22,7 +22,9 @@ import za.co.neroland.neroruins.data.ExpeditionRecord;
 import za.co.neroland.neroruins.expedition.RuinLocator;
 
 /**
- * {@code neroruins:ruins} ({@link MapScope#DISCOVERED}): one marker per ruin hub in the viewer's own Expedition
+ * {@code neroruins:expedition_target} ({@link MapScope#OWNER}): see {@link #queryTarget}.
+ *
+ * <p>{@code neroruins:ruins} ({@link MapScope#DISCOVERED}): one marker per ruin hub in the viewer's own Expedition
  * Record that still carries a position. Hub-less discoveries (position recording off, or dropped by retention)
  * are omitted, never estimated. A hub within {@link RuinLocator#SAME_SITE_BLOCKS} of a vault the viewer claimed
  * is drawn in its claimed state; claims alone never produce a marker, and other claimers never appear.
@@ -32,8 +34,15 @@ import za.co.neroland.neroruins.expedition.RuinLocator;
  */
 final class RuinsMapLayerProvider implements MapLayerProvider {
 
-    private static final List<MapLayerInfo> LAYERS = List.of(MapLayerInfo.of(RuinsMapLayers.RUINS,
-            "map.layer.neroruins.ruins", RuinsMapLayers.ICON_RUIN, MapScope.DISCOVERED));
+    /** How far from the viewer the expedition marker is drawn, whatever the real distance. */
+    static final int TARGET_MARKER_DISTANCE = 96;
+    private static final String[] POINTS = { "n", "ne", "e", "se", "s", "sw", "w", "nw" };
+
+    private static final List<MapLayerInfo> LAYERS = List.of(
+            MapLayerInfo.of(RuinsMapLayers.RUINS, "map.layer.neroruins.ruins", RuinsMapLayers.ICON_RUIN,
+                    MapScope.DISCOVERED),
+            MapLayerInfo.of(RuinsMapLayers.EXPEDITION_TARGET, "map.layer.neroruins.expedition_target",
+                    RuinsMapLayers.ICON_EXPEDITION_TARGET, MapScope.OWNER).withDefaults(true, true).withCap(1));
 
     private final RuinsMapSource source;
 
@@ -53,7 +62,53 @@ final class RuinsMapLayerProvider implements MapLayerProvider {
 
     @Override
     public void query(MapViewer viewer, ResourceKey<Level> dimension, MapBounds bounds, MapLayerSink sink) {
-        if (viewer == null || dimension == null || bounds == null || sink.isFull(RuinsMapLayers.RUINS)) return;
+        if (viewer == null || dimension == null || bounds == null) return;
+        queryTarget(viewer, dimension, bounds, sink);
+        queryRuins(viewer, dimension, bounds, sink);
+    }
+
+    /**
+     * The expedition marker: online viewer, holding the compass, in the compass target's world and in the queried
+     * one. Drawn {@link #TARGET_MARKER_DISTANCE} blocks away along the centre of the compass point's 45-degree
+     * sector, so it reveals only the point and the band, exactly like the compass's own reading.
+     */
+    private void queryTarget(MapViewer viewer, ResourceKey<Level> dimension, MapBounds bounds, MapLayerSink sink) {
+        if (sink.isFull(RuinsMapLayers.EXPEDITION_TARGET) || !viewer.online()) return;
+        if (viewer.dimension().isEmpty() || !viewer.dimension().get().equals(dimension)) return;
+        if (viewer.position().isEmpty()) return;
+        var reading = source.compass(viewer);
+        if (reading.isEmpty() || !reading.get().dimension().equals(dimension.identifier().toString())) return;
+        BlockPos at = viewer.position().get();
+        int[] offset = targetOffset(reading.get().point());
+        if (offset == null) return;
+        int x = at.getX() + offset[0];
+        int z = at.getZ() + offset[1];
+        if (!bounds.contains(x, z)) return;
+        sink.marker(MapMarker.builder("expedition_target", RuinsMapLayers.EXPEDITION_TARGET, dimension,
+                        x, at.getY(), z)
+                .label(MapLabel.translatable("map.neroruins.expedition_target"))
+                .detail(MapLabel.translatable("bearing.neroruins." + reading.get().point()))
+                .detail(MapLabel.translatable("bearing.neroruins.band." + reading.get().band()))
+                .build());
+    }
+
+    /**
+     * The marker offset for a compass point: {@link #TARGET_MARKER_DISTANCE} blocks along the sector centre
+     * (north is negative Z), {@code {0, 0}} for {@code here}, or {@code null} for an unknown point.
+     */
+    static int[] targetOffset(String point) {
+        if ("here".equals(point)) return new int[] {0, 0};
+        for (int sector = 0; sector < POINTS.length; sector++) {
+            if (!POINTS[sector].equals(point)) continue;
+            double radians = Math.toRadians(sector * 45.0);
+            return new int[] {(int) Math.round(Math.sin(radians) * TARGET_MARKER_DISTANCE),
+                    (int) Math.round(-Math.cos(radians) * TARGET_MARKER_DISTANCE)};
+        }
+        return null;
+    }
+
+    private void queryRuins(MapViewer viewer, ResourceKey<Level> dimension, MapBounds bounds, MapLayerSink sink) {
+        if (sink.isFull(RuinsMapLayers.RUINS)) return;
         String dim = dimension.identifier().toString();
         List<ExpeditionRecord.Discovery> hubs = new ArrayList<>();
         for (ExpeditionRecord.Discovery discovery : source.discoveries(viewer)) {
