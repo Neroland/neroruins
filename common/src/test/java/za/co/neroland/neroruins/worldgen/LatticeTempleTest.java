@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 import za.co.neroland.neroruins.guardian.SpawnTable;
 import za.co.neroland.neroruins.lore.LogCatalog;
 import za.co.neroland.neroruins.worldgen.placement.SatelliteLayout;
+import za.co.neroland.neroruins.TestResources;
 
 /** Resource checks for the lattice_temple family; the layout graph itself is walked in tools/test_lattice_temple.py. */
 class LatticeTempleTest {
@@ -71,7 +72,7 @@ class LatticeTempleTest {
                 var definition = element.getAsJsonObject().getAsJsonObject("element");
                 assertEquals("neroruins:lattice_temple", definition.get("processors").getAsString());
                 String location = definition.get("location").getAsString().substring("neroruins:".length());
-                try (var template = getClass().getResourceAsStream("/data/neroruins/structure/" + location + ".nbt")) {
+                try (var template = getClass().getResourceAsStream(TestResources.path("/data/neroruins/structure/" + location + ".nbt"))) {
                     assertNotNull(template, location);
                 }
             }

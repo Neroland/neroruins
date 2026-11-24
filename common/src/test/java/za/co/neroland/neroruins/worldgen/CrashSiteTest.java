@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import za.co.neroland.neroruins.lore.LogCatalog;
 import za.co.neroland.neroruins.worldgen.placement.SatelliteLayout;
 import za.co.neroland.neroruins.worldgen.structure.GroundCheck;
+import za.co.neroland.neroruins.TestResources;
 
 class CrashSiteTest {
     private static final String[][] HUBS = {
@@ -27,7 +28,7 @@ class CrashSiteTest {
             { "crash_site_outpost", "outpost", "2", "0" } };
 
     private JsonObject json(String path) throws Exception {
-        try (var input = getClass().getResourceAsStream(path)) {
+        try (var input = getClass().getResourceAsStream(TestResources.path(path))) {
             assertNotNull(input, path);
             return JsonParser.parseReader(new InputStreamReader(input, StandardCharsets.UTF_8)).getAsJsonObject();
         }
@@ -54,8 +55,8 @@ class CrashSiteTest {
                 for (var entry : pool.getAsJsonArray("elements")) {
                     String location = entry.getAsJsonObject().getAsJsonObject("element").get("location").getAsString();
                     assertTrue(seen.add(location));
-                    try (var template = getClass().getResourceAsStream("/data/neroruins/structure/"
-                            + location.substring("neroruins:".length()) + ".nbt")) {
+                    try (var template = getClass().getResourceAsStream(TestResources.path("/data/neroruins/structure/"
+                            + location.substring("neroruins:".length()) + ".nbt"))) {
                         assertNotNull(template, location);
                         var nbt = NbtIo.readCompressed(template, NbtAccounter.unlimitedHeap());
                         assertTrue(nbt.get("blocks").toString().contains("neroruins:vault_cache"));
@@ -116,7 +117,7 @@ class CrashSiteTest {
     }
 
     private void assertNotNullOrMissing(String path) throws Exception {
-        try (var input = getClass().getResourceAsStream(path)) {
+        try (var input = getClass().getResourceAsStream(TestResources.path(path))) {
             assertEquals(null, input, "no satellite beyond the configured count: " + path);
         }
     }
@@ -125,8 +126,8 @@ class CrashSiteTest {
     void theMeridianCarriesTheWholeCindaraChapterAndTheKeystone() throws Exception {
         var logs = new HashSet<String>();
         for (String variant : new String[] { "a", "b", "c" }) {
-            try (var template = getClass().getResourceAsStream("/data/neroruins/structure/crash_site_meridian_"
-                    + variant + ".nbt")) {
+            try (var template = getClass().getResourceAsStream(TestResources.path("/data/neroruins/structure/crash_site_meridian_"
+                    + variant + ".nbt"))) {
                 assertNotNull(template);
                 String blocks = NbtIo.readCompressed(template, NbtAccounter.unlimitedHeap()).get("blocks").toString();
                 for (int n = 1; n <= 6; n++) {

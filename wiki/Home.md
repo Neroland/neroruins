@@ -4,6 +4,9 @@
 generation ship, crashed freighters and the temples of the vanished Architects. Each ruin has rooms to
 explore, guardians, a puzzle gate, a vault and data logs that tell one story across nine chapters.
 
+The Java 21 builds support Minecraft 1.20.5 on Fabric and 1.20.6 on Fabric,
+Forge and NeoForge. These builds require Neroland Core 1.23.0.
+
 > **Status: 0.5.1-beta.1.** Everything on these pages is in the mod and covered by automated tests, but
 > most structures have not yet been played through end to end in survival. Please report anything that
 > breaks.

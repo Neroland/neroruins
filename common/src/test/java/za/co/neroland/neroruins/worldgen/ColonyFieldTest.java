@@ -14,6 +14,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
 import za.co.neroland.neroruins.guardian.SpawnTable;
+import za.co.neroland.neroruins.TestResources;
 
 /** The Colony Field family as packaged: hubs, satellites, biome tags, guardians and loot (decision 037). */
 class ColonyFieldTest {
@@ -21,7 +22,7 @@ class ColonyFieldTest {
     private static final String[] SATELLITE_ROLES = { "habring", "fields", "silo", "cemetery", "wreck" };
 
     private JsonObject json(String path) throws Exception {
-        try (var input = getClass().getResourceAsStream(path)) {
+        try (var input = getClass().getResourceAsStream(TestResources.path(path))) {
             assertNotNull(input, path);
             return JsonParser.parseReader(new InputStreamReader(input, StandardCharsets.UTF_8)).getAsJsonObject();
         }
@@ -60,7 +61,7 @@ class ColonyFieldTest {
             assertEquals(3, hubs.size(), "three hub variants per size class");
             for (var element : hubs) {
                 String location = element.getAsJsonObject().getAsJsonObject("element").get("location").getAsString();
-                assertTrue(exists("/data/neroruins/structure/" + location.substring("neroruins:".length()) + ".nbt"),
+                assertTrue(exists(TestResources.path("/data/neroruins/structure/" + location.substring("neroruins:".length()) + ".nbt")),
                         location);
             }
             var set = json("/data/neroruins/worldgen/structure_set/" + name + ".json").getAsJsonObject("placement");

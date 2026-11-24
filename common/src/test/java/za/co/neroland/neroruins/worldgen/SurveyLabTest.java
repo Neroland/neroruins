@@ -23,6 +23,7 @@ import net.minecraft.nbt.NbtIo;
 import org.junit.jupiter.api.Test;
 import za.co.neroland.neroruins.lore.LogCatalog;
 import za.co.neroland.neroruins.worldgen.structure.GroundCheck;
+import za.co.neroland.neroruins.TestResources;
 
 /** The Survey Lab family as data: hubs, budgets, packaged templates and placement (decision 036). */
 class SurveyLabTest {
@@ -33,15 +34,15 @@ class SurveyLabTest {
             "survey_lab_outpost", new int[] { 3, 1 });
 
     private JsonObject json(String path) throws Exception {
-        try (var input = getClass().getResourceAsStream(path)) {
+        try (var input = getClass().getResourceAsStream(TestResources.path(path))) {
             assertNotNull(input, path);
             return JsonParser.parseReader(new InputStreamReader(input, StandardCharsets.UTF_8)).getAsJsonObject();
         }
     }
 
     private CompoundTag template(String location) throws Exception {
-        try (var input = getClass().getResourceAsStream("/data/neroruins/structure/"
-                + location.substring("neroruins:".length()) + ".nbt")) {
+        try (var input = getClass().getResourceAsStream(TestResources.path("/data/neroruins/structure/"
+                + location.substring("neroruins:".length()) + ".nbt"))) {
             assertNotNull(input, location);
             return NbtIo.readCompressed(input, NbtAccounter.unlimitedHeap());
         }

@@ -22,6 +22,7 @@ import net.minecraft.nbt.NbtIo;
 import org.junit.jupiter.api.Test;
 import za.co.neroland.neroruins.guardian.SpawnTable;
 import za.co.neroland.neroruins.lore.LogCatalog;
+import za.co.neroland.neroruins.TestResources;
 
 /** Resource checks for the Halcyon Ark family; the layout graph itself is walked by tools/test_halcyon_ark.py. */
 class HalcyonArkTest {
@@ -29,14 +30,14 @@ class HalcyonArkTest {
     private static final String[] SECTION = { "hub", "cryo", "guard", "engineering", "medbay", "captain" };
 
     private JsonObject json(String path) throws Exception {
-        try (var input = getClass().getResourceAsStream(path)) {
+        try (var input = getClass().getResourceAsStream(TestResources.path(path))) {
             assertNotNull(input, path);
             return JsonParser.parseReader(new InputStreamReader(input, StandardCharsets.UTF_8)).getAsJsonObject();
         }
     }
 
     private CompoundTag template(String name) throws Exception {
-        try (var input = getClass().getResourceAsStream("/data/neroruins/structure/" + name + ".nbt")) {
+        try (var input = getClass().getResourceAsStream(TestResources.path("/data/neroruins/structure/" + name + ".nbt"))) {
             assertNotNull(input, name);
             return NbtIo.readCompressed(input, NbtAccounter.unlimitedHeap());
         }

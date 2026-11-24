@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-24
+
+### Added
+
+- Minecraft 1.20.5 on Fabric and 1.20.6 on Fabric, Forge and NeoForge, with
+  Neroland Core 1.23.0. The legacy jars package ruin templates, loot tables and
+  tags in the directories those Minecraft versions read.
+
 ## [0.6.0] - 2026-11-22
 
 ### Added

@@ -14,6 +14,7 @@ import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtIo;
 import org.junit.jupiter.api.Test;
 import za.co.neroland.neroruins.lore.LogCatalog;
+import za.co.neroland.neroruins.TestResources;
 
 class BunkerPrototypeTest {
     @Test
@@ -33,8 +34,8 @@ class BunkerPrototypeTest {
                     String location = definition.getAsJsonObject("element").get("location").getAsString();
                     assertTrue(location.startsWith("neroruins:"));
                     assertTrue(seen.add(location));
-                    try (var template = getClass().getResourceAsStream("/data/neroruins/structure/"
-                            + location.substring("neroruins:".length()) + ".nbt")) {
+                    try (var template = getClass().getResourceAsStream(TestResources.path("/data/neroruins/structure/"
+                            + location.substring("neroruins:".length()) + ".nbt"))) {
                         assertNotNull(template, location);
                         var nbt = NbtIo.readCompressed(template, NbtAccounter.unlimitedHeap());
                         assertTrue(nbt.get("blocks").toString().contains("minecraft:jigsaw"));
@@ -46,7 +47,7 @@ class BunkerPrototypeTest {
     }
 
     private com.google.gson.JsonObject json(String path) throws Exception {
-        try (var input = getClass().getResourceAsStream(path)) {
+        try (var input = getClass().getResourceAsStream(TestResources.path(path))) {
             assertNotNull(input, path);
             return JsonParser.parseReader(new InputStreamReader(input, StandardCharsets.UTF_8)).getAsJsonObject();
         }
@@ -118,8 +119,8 @@ class BunkerPrototypeTest {
                 assertTrue(elements.size() >= 2, "every satellite role has variants");
                 for (var element : elements) {
                     String location = element.getAsJsonObject().getAsJsonObject("element").get("location").getAsString();
-                    assertNotNull(getClass().getResource("/data/neroruins/structure/"
-                            + location.substring("neroruins:".length()) + ".nbt"), location);
+                    assertNotNull(getClass().getResource(TestResources.path("/data/neroruins/structure/"
+                            + location.substring("neroruins:".length()) + ".nbt")), location);
                 }
             }
         }
@@ -140,7 +141,7 @@ class BunkerPrototypeTest {
 
     @Test
     void packagedBunkerLootCarriesSixValidLogIds() throws Exception {
-        try (var input = getClass().getResourceAsStream("/data/neroruins/loot_table/chests/bunker_logs.json")) {
+        try (var input = getClass().getResourceAsStream(TestResources.path("/data/neroruins/loot_table/chests/bunker_logs.json"))) {
             assertNotNull(input);
             var loot = JsonParser.parseReader(new InputStreamReader(input, StandardCharsets.UTF_8)).getAsJsonObject();
             var entries = loot.getAsJsonArray("pools").get(0).getAsJsonObject().getAsJsonArray("entries");

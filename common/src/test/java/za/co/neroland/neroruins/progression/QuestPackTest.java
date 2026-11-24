@@ -28,6 +28,7 @@ import com.google.gson.JsonParser;
 import org.junit.jupiter.api.Test;
 
 import za.co.neroland.neroruins.lore.LogCatalog;
+import za.co.neroland.neroruins.TestResources;
 
 /**
  * The "Expedition Notes" NeroQuests chapter is inert data, so nothing at runtime checks it against this
@@ -49,7 +50,7 @@ class QuestPackTest {
     private static final Set<String> EMITTED_CHANNELS = Set.of(RuinMilestones.VAULT_CLAIMED.toString());
 
     private static JsonObject json(String path) throws IOException {
-        try (var input = QuestPackTest.class.getResourceAsStream(path)) {
+        try (var input = QuestPackTest.class.getResourceAsStream(TestResources.path(path))) {
             assertNotNull(input, path);
             return JsonParser.parseReader(new InputStreamReader(input, StandardCharsets.UTF_8)).getAsJsonObject();
         }
