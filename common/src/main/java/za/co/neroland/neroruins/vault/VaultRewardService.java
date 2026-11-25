@@ -57,9 +57,13 @@ public final class VaultRewardService {
         if (ledger.reservation(location, player.getUUID()).isPresent()) return Result.RESERVED;
         Identifier table = tableId == null ? null : Identifier.tryParse(tableId);
         if (table == null) return Result.UNAVAILABLE;
+        //? if >=1.20.5 {
         var key = ResourceKey.create(Registries.LOOT_TABLE, table);
         var registry = server.reloadableRegistries().lookup().lookupOrThrow(Registries.LOOT_TABLE);
         if (registry.get(key).isEmpty()) return Result.UNAVAILABLE;
+        //?} else {
+        /*if (server.getLootData().getLootTable(table) == LootTable.EMPTY) return Result.UNAVAILABLE;
+        *///?}
         if (ledger.mayClaim(location, player.getUUID(), policy.get(), System.currentTimeMillis())) return Result.AVAILABLE;
         return refusal(policy.get(), ledger.lastClaim(location, player.getUUID()) != null);
     }
@@ -156,7 +160,11 @@ public final class VaultRewardService {
             String tableId, ClaimLedger ledger, ClaimLedger.Location location, long now) {
         Identifier table = Identifier.tryParse(tableId);
         var server = level.getServer();
+        //? if >=1.20.5 {
         LootTable lootTable = server.reloadableRegistries().getLootTable(ResourceKey.create(Registries.LOOT_TABLE, table));
+        //?} else {
+        /*LootTable lootTable = server.getLootData().getLootTable(table);
+        *///?}
         LootParams params = new LootParams.Builder(level).withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
                 .withOptionalParameter(LootContextParams.THIS_ENTITY, player).withLuck(player.getLuck())
                 .create(LootContextParamSets.CHEST);

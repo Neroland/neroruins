@@ -16,8 +16,13 @@ import za.co.neroland.neroruins.data.ExpeditionRecord;
  * Map. A discovery whose position was dropped by retention or never kept is sent without coordinates.
  */
 public record ExpeditionSnapshot(List<Entry> entries) implements CustomPacketPayload {
+    //? if >=1.20.5 {
     public static final Type<ExpeditionSnapshot> TYPE = new Type<>(
             Identifier.fromNamespaceAndPath(NeroRuinsCommon.MOD_ID, "expedition_snapshot"));
+    //?} else {
+    /*public static final Type<ExpeditionSnapshot> TYPE = new Type<>(
+            Identifier.fromNamespaceAndPath(NeroRuinsCommon.MOD_ID, "expedition_snapshot"), ExpeditionSnapshot.class);
+    *///?}
     public static final StreamCodec<RegistryFriendlyByteBuf, ExpeditionSnapshot> CODEC =
             StreamCodec.of(ExpeditionSnapshot::write, ExpeditionSnapshot::read);
     public static final int MAX_ENTRIES = 256;

@@ -48,7 +48,7 @@ public final class ModCreativeTab {
                         }
                         for (String id : LogCatalog.ids()) {
                             ItemStack shard = new ItemStack(ModItems.DATA_SHARD.get());
-                            shard.set(ModItems.LOG_ID.get(), id);
+                            za.co.neroland.neroruins.item.DataShardItem.setLogId(shard, id);
                             output.accept(shard);
                         }
                     })

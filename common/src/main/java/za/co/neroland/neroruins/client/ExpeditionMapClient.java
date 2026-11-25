@@ -39,8 +39,10 @@ public final class ExpeditionMapClient {
         for (String page : CodexPagination.groupedPages(groups)) pages.add(Component.literal(page));
         //? if >=26.2 {
         Minecraft.getInstance().setScreenAndShow(new BookViewScreen(new BookViewScreen.BookAccess(pages)));
-        //?} else {
+        //?} else if >=1.20.5 {
         /*Minecraft.getInstance().setScreen(new BookViewScreen(new BookViewScreen.BookAccess(pages)));
+        *///?} else {
+        /*za.co.neroland.neroruins.client.CodexClient.openLegacyBook(pages);
         *///?}
     }
 

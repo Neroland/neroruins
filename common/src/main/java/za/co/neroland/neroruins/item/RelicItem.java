@@ -24,9 +24,17 @@ public final class RelicItem extends Item {
         tooltip.accept(line(1));
         tooltip.accept(passive());
     }
-    //?} else {
+    //?} else if >=1.20.5 {
     /*@Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context,
+            java.util.List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(line(0));
+        tooltip.add(line(1));
+        tooltip.add(passive());
+    }
+    *///?} else {
+    /*@Override
+    public void appendHoverText(ItemStack stack, net.minecraft.world.level.Level level,
             java.util.List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(line(0));
         tooltip.add(line(1));

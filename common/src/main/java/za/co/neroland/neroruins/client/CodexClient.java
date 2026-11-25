@@ -51,8 +51,10 @@ public final class CodexClient {
         }
         //? if >=26.2 {
         Minecraft.getInstance().setScreenAndShow(new BookViewScreen(new BookViewScreen.BookAccess(pages)));
-        //?} else {
+        //?} else if >=1.20.5 {
         /*Minecraft.getInstance().setScreen(new BookViewScreen(new BookViewScreen.BookAccess(pages)));
+        *///?} else {
+        /*za.co.neroland.neroruins.client.CodexClient.openLegacyBook(pages);
         *///?}
     }
 
@@ -64,4 +66,15 @@ public final class CodexClient {
         return Minecraft.getInstance().font.getSplitter().splitLines(text, 114, Style.EMPTY).stream()
                 .map(line -> line.getString()).toList();
     }
+    //? if <1.20.5 {
+    /*public static void openLegacyBook(List<Component> pages) {
+        List<Component> snapshot = List.copyOf(pages);
+        Minecraft.getInstance().setScreen(new BookViewScreen(new BookViewScreen.BookAccess() {
+            @Override
+            public int getPageCount() { return snapshot.size(); }
+            @Override
+            public Component getPageRaw(int page) { return snapshot.get(page); }
+        }));
+    }
+    *///?}
 }

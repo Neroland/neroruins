@@ -148,7 +148,9 @@ public final class ExpeditionRecord extends SavedData {
                 Codec.STRING.fieldOf("dimension").forGetter(Entry::dimension),
                 Codec.INT.listOf().optionalFieldOf("hub").forGetter(Entry::hub),
                 Codec.LONG.fieldOf("first_seen").forGetter(Entry::firstSeen)
-        ).apply(instance, Entry::new)).validate(entry -> {
+        ).apply(instance, Entry::new)).flatXmap(Entry::validateEntry, Entry::validateEntry);
+
+        private static DataResult<Entry> validateEntry(Entry entry) {
             try {
                 UUID.fromString(entry.player);
                 entry.discovery();
@@ -156,7 +158,7 @@ public final class ExpeditionRecord extends SavedData {
             } catch (IllegalArgumentException failure) {
                 return DataResult.error(() -> "Invalid expedition entry");
             }
-        });
+        }
 
         private Discovery discovery() {
             Optional<Hub> position = hub.map(values -> {

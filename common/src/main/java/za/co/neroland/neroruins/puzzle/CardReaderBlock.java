@@ -72,7 +72,12 @@ public final class CardReaderBlock extends Block {
     }
 
     @Override
+    //? if >=1.20.5 {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    //?} else {
+    /*public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+    *///?}
         if (level instanceof ServerLevel server && player instanceof ServerPlayer serverPlayer) {
             if (state.getValue(ACCEPTED)) return InteractionResult.CONSUME;
             int tier = state.getValue(TIER);

@@ -151,11 +151,19 @@ class BunkerPrototypeTest {
                 //? if >=26.3 {
                 var modifier = entry.getAsJsonObject("modifier");
                 assertEquals("minecraft:set_components", modifier.get("type").getAsString());
-                //?} else {
+                //?} else if >=1.20.5 {
                 /*var modifier = entry.getAsJsonArray("functions").get(0).getAsJsonObject();
                 assertEquals("minecraft:set_components", modifier.get("function").getAsString());
+                *///?} else {
+                /*var modifier = entry.getAsJsonArray("functions").get(0).getAsJsonObject();
+                assertEquals("minecraft:set_nbt", modifier.get("function").getAsString());
                 *///?}
+                //? if >=1.20.5 {
                 String id = modifier.getAsJsonObject("components").get("neroruins:log_id").getAsString();
+                //?} else {
+                /*String id = JsonParser.parseString(modifier.get("tag").getAsString()).getAsJsonObject()
+                        .get("neroruins:log_id").getAsString();
+                *///?}
                 assertTrue(LogCatalog.translationPrefix(id).isPresent());
                 assertTrue(ids.add(id));
             }

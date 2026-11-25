@@ -78,7 +78,12 @@ public final class RelicSocketBlock extends Block {
     public static Item relic(int chapter) { return ModItems.RELICS.get(chapter - 1).get(); }
 
     @Override
+    //? if >=1.20.5 {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    //?} else {
+    /*public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+    *///?}
         if (level instanceof ServerLevel server && player instanceof ServerPlayer serverPlayer) {
             if (state.getValue(LIT)) return InteractionResult.CONSUME;
             Item wanted = relic(state.getValue(CHAPTER));

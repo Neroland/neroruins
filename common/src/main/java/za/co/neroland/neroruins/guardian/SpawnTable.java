@@ -1,5 +1,6 @@
 package za.co.neroland.neroruins.guardian;
 
+import za.co.neroland.neroruins.data.CodecChecks;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,22 +34,34 @@ public record SpawnTable(List<Entry> entries) {
 
     public record Entry(String entity, int weight, int minTier, int maxTier, boolean required) {
         public static final Codec<Entry> CODEC = RecordCodecBuilder.<Entry>create(instance -> instance.group(
-                Codec.STRING.validate(id -> Identifier.tryParse(id) != null && id.contains(":")
-                        ? DataResult.success(id) : DataResult.error(() -> "Invalid entity id")).fieldOf("entity").forGetter(Entry::entity),
+                Codec.STRING.flatXmap(Entry::validateEntityId, Entry::validateEntityId).fieldOf("entity").forGetter(Entry::entity),
                 Codec.intRange(1, 1000).fieldOf("weight").forGetter(Entry::weight),
-                Codec.intRange(1, MAX_TIER).optionalFieldOf("min_tier", 1).forGetter(Entry::minTier),
-                Codec.intRange(1, MAX_TIER).optionalFieldOf("max_tier", MAX_TIER).forGetter(Entry::maxTier),
-                Codec.BOOL.optionalFieldOf("required", true).forGetter(Entry::required)
-        ).apply(instance, Entry::new)).validate(entry -> entry.minTier() <= entry.maxTier()
-                ? DataResult.success(entry) : DataResult.error(() -> "min_tier is above max_tier"));
+                CodecChecks.optionalField(CodecChecks.intRange(1, MAX_TIER), "min_tier", 1).forGetter(Entry::minTier),
+                CodecChecks.optionalField(CodecChecks.intRange(1, MAX_TIER), "max_tier", MAX_TIER).forGetter(Entry::maxTier),
+                CodecChecks.optionalField(Codec.BOOL, "required", true).forGetter(Entry::required)
+        ).apply(instance, Entry::new)).flatXmap(Entry::validateEntry, Entry::validateEntry);
+
+    private static DataResult<String> validateEntityId(String id) {
+        return Identifier.tryParse(id) != null && id.contains(":")
+                ? DataResult.success(id) : DataResult.error(() -> "Invalid entity id");
+    }
+
+        private static DataResult<Entry> validateEntry(Entry entry) {
+            return entry.minTier() <= entry.maxTier()
+                    ? DataResult.success(entry) : DataResult.error(() -> "min_tier is above max_tier");
+        }
 
         boolean covers(int tier) { return tier >= minTier && tier <= maxTier; }
     }
 
     public static final Codec<SpawnTable> CODEC = RecordCodecBuilder.<SpawnTable>create(instance -> instance.group(
             Entry.CODEC.listOf().fieldOf("entries").forGetter(SpawnTable::entries)
-    ).apply(instance, SpawnTable::new)).validate(table -> !table.entries().isEmpty() && table.entries().size() <= 64
-            ? DataResult.success(table) : DataResult.error(() -> "A spawn table needs 1 to 64 entries"));
+    ).apply(instance, SpawnTable::new)).flatXmap(SpawnTable::validateTable, SpawnTable::validateTable);
+
+    private static DataResult<SpawnTable> validateTable(SpawnTable table) {
+        return !table.entries().isEmpty() && table.entries().size() <= 64
+                ? DataResult.success(table) : DataResult.error(() -> "A spawn table needs 1 to 64 entries");
+    }
 
     public SpawnTable {
         entries = List.copyOf(entries);

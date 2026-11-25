@@ -299,7 +299,9 @@ public final class ClaimLedger extends SavedData {
                 Codec.INT.fieldOf("x").forGetter(Entry::x), Codec.INT.fieldOf("y").forGetter(Entry::y),
                 Codec.INT.fieldOf("z").forGetter(Entry::z), Codec.STRING.fieldOf("player").forGetter(Entry::player),
                 Codec.LONG.fieldOf("claimed_at").forGetter(Entry::claimedAt)
-        ).apply(instance, Entry::new)).validate(entry -> {
+        ).apply(instance, Entry::new)).flatXmap(Entry::validateEntry, Entry::validateEntry);
+
+        private static DataResult<Entry> validateEntry(Entry entry) {
             try {
                 new Location(entry.dimension, entry.x, entry.y, entry.z);
                 UUID.fromString(entry.player);
@@ -308,7 +310,7 @@ public final class ClaimLedger extends SavedData {
             } catch (IllegalArgumentException failure) {
                 return DataResult.error(() -> "Invalid vault claim");
             }
-        });
+        }
     }
 
     private record Pending(String dimension, int x, int y, int z, String player, String lootTable, long reservedAt,
@@ -321,7 +323,9 @@ public final class ClaimLedger extends SavedData {
                 Codec.LONG.fieldOf("reserved_at").forGetter(Pending::reservedAt),
                 Codec.LONG.optionalFieldOf("previous_claim").forGetter(Pending::previousClaim),
                 CompoundTag.CODEC.listOf().fieldOf("items").forGetter(Pending::items)
-        ).apply(instance, Pending::new)).validate(pending -> {
+        ).apply(instance, Pending::new)).flatXmap(Pending::validatePending, Pending::validatePending);
+
+        private static DataResult<Pending> validatePending(Pending pending) {
             try {
                 new Location(pending.dimension, pending.x, pending.y, pending.z);
                 UUID.fromString(pending.player);
@@ -330,7 +334,7 @@ public final class ClaimLedger extends SavedData {
             } catch (IllegalArgumentException failure) {
                 return DataResult.error(() -> "Invalid vault reservation");
             }
-        });
+        }
 
         private Reservation reservation() {
             return new Reservation(lootTable, reservedAt, previousClaim.orElse(null), items);
@@ -342,7 +346,7 @@ public final class ClaimLedger extends SavedData {
     public static Codec<ClaimLedger> codec() {
         return RecordCodecBuilder.<Stored>create(instance -> instance.group(
                 Entry.CODEC.listOf().fieldOf("entries").forGetter(Stored::entries),
-                Pending.CODEC.listOf().optionalFieldOf("reservations", List.of()).forGetter(Stored::reservations)
+                CodecChecks.optionalField(Pending.CODEC.listOf(), "reservations", List.of()).forGetter(Stored::reservations)
         ).apply(instance, Stored::new)).xmap(ClaimLedger::decode, ClaimLedger::encode);
     }
 

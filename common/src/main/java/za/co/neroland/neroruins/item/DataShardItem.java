@@ -20,7 +20,7 @@ public final class DataShardItem extends Item {
 
     @Override
     public Component getName(ItemStack stack) {
-        return LogCatalog.translationPrefix(stack.get(ModItems.LOG_ID.get()))
+        return LogCatalog.translationPrefix(logId(stack))
                 .<Component>map(prefix -> Component.translatable("item.neroruins.data_shard.named",
                         Component.translatable(prefix + ".title")))
                 .orElseGet(() -> super.getName(stack));
@@ -34,7 +34,7 @@ public final class DataShardItem extends Item {
     *///?}
         ItemStack stack = player.getItemInHand(hand);
         if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer) {
-            String id = stack.get(ModItems.LOG_ID.get());
+            String id = logId(stack);
             var prefix = LogCatalog.translationPrefix(id);
             if (prefix.isEmpty()) {
                 message(serverPlayer, Component.translatable("message.neroruins.shard.invalid"));
@@ -76,6 +76,33 @@ public final class DataShardItem extends Item {
         player.sendSystemMessage(text);
         //?} else {
         /*player.displayClientMessage(text, false);
+        *///?}
+    }
+    public static void setLogId(ItemStack stack, String id) {
+        //? if >=1.20.5 {
+        stack.set(ModItems.LOG_ID.get(), id);
+        //?} else {
+        /*stack.getOrCreateTag().putString("neroruins:log_id", id);
+        *///?}
+    }
+
+    static String logId(ItemStack stack) {
+        //? if >=1.20.5 {
+        String id = stack.get(ModItems.LOG_ID.get());
+        if (id != null) {
+            return id;
+        }
+        var data = stack.get(net.minecraft.core.component.DataComponents.CUSTOM_DATA);
+        if (data == null) {
+            return null;
+        }
+        //? if >=1.21.5 {
+        return data.copyTag().getStringOr("neroruins:log_id", "");
+        //?} else {
+        /*return data.copyTag().getString("neroruins:log_id");
+        *///?}
+        //?} else {
+        /*return stack.hasTag() ? stack.getTag().getString("neroruins:log_id") : null;
         *///?}
     }
 }

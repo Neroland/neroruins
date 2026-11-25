@@ -12,8 +12,13 @@ import za.co.neroland.neroruins.NeroRuinsCommon;
 import za.co.neroland.neroruins.lore.LogCatalog;
 
 public record CodexSnapshot(List<String> logs) implements CustomPacketPayload {
+    //? if >=1.20.5 {
     public static final Type<CodexSnapshot> TYPE = new Type<>(
             Identifier.fromNamespaceAndPath(NeroRuinsCommon.MOD_ID, "codex_snapshot"));
+    //?} else {
+    /*public static final Type<CodexSnapshot> TYPE = new Type<>(
+            Identifier.fromNamespaceAndPath(NeroRuinsCommon.MOD_ID, "codex_snapshot"), CodexSnapshot.class);
+    *///?}
     public static final StreamCodec<RegistryFriendlyByteBuf, CodexSnapshot> CODEC =
             StreamCodec.of(CodexSnapshot::write, CodexSnapshot::read);
     private static final int MAX_LOGS = 54;

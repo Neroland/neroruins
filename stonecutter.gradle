@@ -31,6 +31,22 @@ ext.commonResources = "${rootProject.projectDir}/common/src/main/resources"
 // AFTER Stonecutter's own //? processing. Only for pure renames Mojang made with no behaviour change;
 // anything else uses //? if blocks in the source. Loader src/ trees do NOT get these (use //? there).
 ext.legacyRenames = [
+    [below: '1.20.5', from: /\bprotected (VoxelShape getShape|BlockState rotate|BlockState mirror|RenderShape getRenderShape|void tick)\(/, to: 'public $1('],
+    [below: '1.20.5', from: /net\.minecraft\.world\.level\.chunk\.status\.ChunkStatus/, to: 'net.minecraft.world.level.chunk.ChunkStatus'],
+    [below: '1.20.5', from: /\b(?:level|server)\.registryAccess\(\)\.createSerializationContext\(NbtOps\.INSTANCE\)/, to: 'NbtOps.INSTANCE'],
+    [below: '1.20.5', from: /\bItemStack\.isSameItemSameComponents\(/, to: 'ItemStack.isSameItemSameTags('],
+    [below: '1.20.5', from: /\.eyeHeight\(1\.6F \* scale\)/, to: ''],
+    [below: '1.20.5', from: /mob\.finalizeSpawn\(server, server\.getCurrentDifficultyAt\(spot\), EntitySpawnReason\.SPAWNER, null\)/, to: 'mob.finalizeSpawn(server, server.getCurrentDifficultyAt(spot), EntitySpawnReason.SPAWNER, null, null)'],
+    [below: '1.20.5', from: /checkStructurePresence\(candidate, hub, spread, false\)/, to: 'checkStructurePresence(candidate, hub, false)'],
+    [below: '1.20.5', from: /Holder<MobEffect> effect/, to: 'MobEffect effect'],
+    [below: '1.20.3', from: /NbtIo\.readCompressed\(file, NbtAccounter\.unlimitedHeap\(\)\)/, to: 'NbtIo.readCompressed(file.toFile())'],
+    [below: '1.20.5', from: /\.getOrThrow\(\)/, to: '.result().orElseThrow()'],
+    [below: '1.20.5', from: /import net\.minecraft\.network\.RegistryFriendlyByteBuf;/, to: 'import net.minecraft.network.FriendlyByteBuf;'],
+    [below: '1.20.5', from: /\bRegistryFriendlyByteBuf\b/, to: 'FriendlyByteBuf'],
+    [below: '1.20.5', from: /import net\.minecraft\.network\.codec\.StreamCodec;/, to: 'import za.co.neroland.nerolandcore.network.legacy.LegacyStreamCodec;'],
+    [below: '1.20.5', from: /\bStreamCodec\b/, to: 'LegacyStreamCodec'],
+    [below: '1.20.5', from: /import net\.minecraft\.network\.protocol\.common\.custom\.CustomPacketPayload;/, to: 'import za.co.neroland.nerolandcore.network.legacy.LegacyPayload;'],
+    [below: '1.20.5', from: /(?<![.\w])CustomPacketPayload\b/, to: 'LegacyPayload'],
     // 1.21.11 renamed ResourceLocation -> Identifier and ResourceKey.location() -> identifier().
     [below: '1.21.11', from: /\bIdentifier\b/, to: 'ResourceLocation'],
     [below: '1.21.11', from: /\.identifier\(\)/, to: '.location()'],
@@ -86,21 +102,62 @@ subprojects {
 
     // Minecraft 1.21.x runs on Java 21, so its cells must emit Java 21 bytecode (and may not use
     // Java 22+ language features). 26.x cells stay on Java 25. A node's project name IS its MC version.
-    def javaRelease = project.name.startsWith('1.') ? 21 : 25
+    def java17Versions = ['1.20', '1.20.1', '1.20.2', '1.20.3', '1.20.4']
+    def javaRelease = project.name in java17Versions ? 17 : project.name.startsWith('1.') ? 21 : 25
     ext.javaRelease = javaRelease
 
-    if (project.name in ['1.20.5', '1.20.6']) {
+    if (project.name == '1.20' || project.name.startsWith('1.20.')) {
+        def packFormats = [
+                '1.20': [15, 15], '1.20.1': [15, 15], '1.20.2': [18, 18],
+                '1.20.3': [22, 26], '1.20.4': [22, 26], '1.20.5': [32, 41], '1.20.6': [32, 41]
+        ][project.name]
         tasks.named('processResources') {
+            inputs.property('packFormats', packFormats)
             eachFile { file ->
                 file.path = file.path.replaceFirst(/^(data\/[^\/]+\/)(advancement|loot_table|recipe|structure)\//, '$1$2s/')
                         .replaceFirst(/^(data\/[^\/]+\/tags\/)(block|entity_type|fluid|item)\//, '$1$2s/')
             }
             includeEmptyDirs = false
+            if (javaRelease == 17) {
+                filesMatching('**/*.mixins.json') {
+                    filter { line -> line.replace('JAVA_21', 'JAVA_17') }
+
+                }
+            }
             doLast {
+                def slurper = new groovy.json.JsonSlurper()
+                if (javaRelease == 17) {
+                    def convertLoot
+                    convertLoot = { value ->
+                        if (value instanceof Map) {
+                            if (value.type == 'minecraft:loot_table' && value.value instanceof String) {
+                                value.name = value.remove('value')
+                            }
+                            if (value.function == 'minecraft:set_components') {
+                                def components = value.remove('components')
+                                if (components.keySet() != (['neroruins:log_id'] as Set)) {
+                                    throw new GradleException('Unsupported data-shard components')
+                                }
+                                value.function = 'minecraft:set_nbt'
+                                value.tag = groovy.json.JsonOutput.toJson(components)
+                            }
+                            value.values().each { convertLoot(it) }
+                        } else if (value instanceof List) {
+                            value.each { convertLoot(it) }
+                        }
+                    }
+                    project.fileTree(destinationDir).matching {
+                        include 'data/neroruins/loot_tables/**/*.json'
+                    }.each { file ->
+                        def loot = slurper.parse(file)
+                        convertLoot(loot)
+                        file.setText(groovy.json.JsonOutput.toJson(loot), 'UTF-8')
+                    }
+                }
                 def metadata = new File(destinationDir, 'pack.mcmeta')
                 def pack = new groovy.json.JsonSlurper().parse(metadata).pack
                 metadata.setText(groovy.json.JsonOutput.toJson([
-                        pack: [description: pack.description, pack_format: 32, supported_formats: [32, 41]]
+                        pack: [description: pack.description, pack_format: packFormats[0], supported_formats: packFormats]
                 ]), 'UTF-8')
             }
         }
@@ -117,18 +174,36 @@ subprojects {
 
     repositories {
         mavenLocal() // Neroland Core (nerolandcore-<loader>-<mc>) published locally; see USING-CORE.md
-        // Neroland Core from GitHub Packages — resolves in CI and on fresh clones, where mavenLocal is
-        // empty. mavenLocal() above still wins for local devs who run Core's publishToMavenLocal.
-        // Auth: gradle props gpr.user/gpr.key, else env GITHUB_ACTOR/GITHUB_TOKEN. Lazy getOrNull() so a
-        // local build that resolves Core from mavenLocal never needs a token. See USING-CORE.md.
-        maven {
-            name = 'NerolandCoreGitHubPackages'
-            url = 'https://maven.pkg.github.com/Neroland/neroland-core'
-            credentials {
-                username = providers.gradleProperty('gpr.user').orElse(providers.environmentVariable('GITHUB_ACTOR')).getOrNull()
-                password = providers.gradleProperty('gpr.key').orElse(providers.environmentVariable('GITHUB_TOKEN')).getOrNull()
+        def gprUser = providers.gradleProperty('gpr.user').orElse(providers.environmentVariable('GITHUB_ACTOR')).getOrNull()
+        def gprKey = providers.gradleProperty('gpr.key').orElse(providers.environmentVariable('GITHUB_TOKEN')).getOrNull()
+        if (gprUser != null && gprKey != null) {
+            def addPackages = { String repoName, String repoSlug, String packageGroup ->
+                def configurePackage = { repo ->
+                    repo.name = repoName
+                    repo.url = uri("https://maven.pkg.github.com/Neroland/$repoSlug")
+                    repo.credentials {
+                        username = gprUser
+                        password = gprKey
+                    }
+                    repo.authentication { basic(org.gradle.authentication.http.BasicAuthentication) }
+                    repo.content { includeGroup packageGroup }
+                }
+                // ForgeGradle forwards Maven repository URLs to Mavenizer without credentials or content filters.
+                // The sibling publications are dependency-free jars at Maven-layout paths.
+                if (project.parent?.name == 'forge') {
+                    ivy { repo ->
+                        configurePackage(repo)
+                        patternLayout {
+                            m2compatible = true
+                            artifact '[organisation]/[module]/[revision]/[artifact]-[revision](-[classifier]).[ext]'
+                        }
+                        metadataSources { artifact() }
+                    }
+                } else {
+                    maven { repo -> configurePackage(repo) }
+                }
             }
-            content { includeGroup 'za.co.neroland.nerolandcore' }
+            addPackages('NerolandCoreGitHubPackages', 'neroland-core', 'za.co.neroland.nerolandcore')
         }
         mavenCentral()
         maven { url 'https://maven.fabricmc.net/' }

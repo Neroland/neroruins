@@ -16,10 +16,14 @@ import za.co.neroland.neroruins.platform.Services;
  */
 public record ModLoadedCondition(String mod) implements LootItemCondition {
     public static final MapCodec<ModLoadedCondition> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
-            Codec.STRING.validate(id -> LootRules.isValidModId(id)
-                    ? DataResult.success(id) : DataResult.error(() -> "Invalid mod id: " + id))
+            Codec.STRING.flatXmap(ModLoadedCondition::validateModId, ModLoadedCondition::validateModId)
                     .fieldOf("mod").forGetter(ModLoadedCondition::mod))
             .apply(instance, ModLoadedCondition::new));
+
+    private static DataResult<String> validateModId(String id) {
+        return LootRules.isValidModId(id)
+                ? DataResult.success(id) : DataResult.error(() -> "Invalid mod id: " + id);
+    }
 
     @Override
     public boolean test(LootContext context) {

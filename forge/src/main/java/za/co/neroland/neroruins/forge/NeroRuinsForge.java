@@ -20,7 +20,12 @@ import za.co.neroland.neroruins.progression.QuestHooks;
 @Mod(NeroRuinsCommon.MOD_ID)
 public final class NeroRuinsForge {
 
+    //? if >=1.20.5 {
     public NeroRuinsForge(FMLJavaModLoadingContext context) {
+    //?} else {
+    /*public NeroRuinsForge() {
+        FMLJavaModLoadingContext context = FMLJavaModLoadingContext.get();
+    *///?}
         NeroRuinsCommon.LOGGER.info("[NeroRuins] Forge bootstrap");
         NeroRuinsCommon.init();
         if (Services.PLATFORM.isClient()) {
@@ -61,8 +66,16 @@ public final class NeroRuinsForge {
         game.addListener((RegisterCommandsEvent event) -> CodexCommands.register(event.getDispatcher()));
         game.addListener((ServerStartedEvent event) -> ServerState.serverStarted(event.getServer()));
         game.addListener((ServerStoppedEvent event) -> ServerState.serverStopped());
+        //? if >=1.20.5 {
         game.addListener((net.minecraftforge.event.TickEvent.ServerTickEvent.Post event) ->
                 za.co.neroland.neroruins.expedition.ExpeditionTracker.tick(event.getServer()));
+        //?} else {
+        game.addListener((net.minecraftforge.event.TickEvent.ServerTickEvent event) -> {
+            if (event.phase == net.minecraftforge.event.TickEvent.Phase.END) {
+                za.co.neroland.neroruins.expedition.ExpeditionTracker.tick(event.getServer());
+            }
+        });
+        //?}
         game.addListener((PlayerEvent.PlayerLoggedInEvent event) -> {
             if (event.getEntity() instanceof ServerPlayer player) {
                 QuestHooks.onJoin(player);

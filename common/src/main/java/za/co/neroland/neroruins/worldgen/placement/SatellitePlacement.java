@@ -37,7 +37,9 @@ public final class SatellitePlacement implements StructurePlacement {
             Codec.intRange(1, 32).fieldOf("min_radius").forGetter(SatellitePlacement::minRadius),
             Codec.intRange(1, 32).fieldOf("max_radius").forGetter(SatellitePlacement::maxRadius),
             Codec.intRange(1, 100).optionalFieldOf("chance_percent", 100).forGetter(SatellitePlacement::chancePercent)
-    ).apply(instance, SatellitePlacement::new)).validate(placement -> {
+    ).apply(instance, SatellitePlacement::new)).flatXmap(SatellitePlacement::validatePlacement, SatellitePlacement::validatePlacement);
+
+    private static DataResult<SatellitePlacement> validatePlacement(SatellitePlacement placement) {
         try {
             SatelliteLayout.offset(0, 0, 0, placement.family, placement.index,
                     placement.minRadius, placement.maxRadius);
@@ -45,7 +47,7 @@ public final class SatellitePlacement implements StructurePlacement {
         } catch (IllegalArgumentException failure) {
             return DataResult.error(() -> "Invalid satellite placement parameters");
         }
-    });
+    }
 
     private final Identifier hubSet;
     private static final AtomicBoolean INVALID_HUB_REPORTED = new AtomicBoolean();

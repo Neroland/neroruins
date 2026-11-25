@@ -23,7 +23,11 @@ public final class ModProcessors {
     /*private static final RegistrationProvider<StructureProcessorType<?>> PROCESSORS =
             Services.REGISTRATION.provider(Registries.STRUCTURE_PROCESSOR, NeroRuinsCommon.MOD_ID);
     public static final RegistrationProvider.RegistryEntry<StructureProcessorType<PuzzleSeedProcessor>> PUZZLE_SEED =
+            //? if >=1.20.5 {
             PROCESSORS.register("puzzle_seed", key -> () -> PuzzleSeedProcessor.CODEC);
+            //?} else {
+            PROCESSORS.register("puzzle_seed", key -> () -> PuzzleSeedProcessor.CODEC.codec());
+            //?}
     *///?}
 
     private ModProcessors() { }

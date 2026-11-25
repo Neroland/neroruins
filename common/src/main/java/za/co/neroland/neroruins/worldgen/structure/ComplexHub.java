@@ -17,26 +17,40 @@ import za.co.neroland.neroruins.worldgen.placement.SatelliteLayout;
 
 public final class ComplexHub extends Structure {
     /** One weighted hub layout; an instance picks one with {@link HubVariant}. */
+    //? if >=1.20.5 {
     public record Layout(int weight, JigsawStructure layout) {
+        private static final Codec<JigsawStructure> LAYOUT_CODEC = JigsawStructure.CODEC.codec();
+    //?} else if >=1.20.3 {
+    /*public record Layout(int weight, JigsawStructure layout) {
+        private static final Codec<JigsawStructure> LAYOUT_CODEC = JigsawStructure.CODEC;
+    *///?} else {
+    /*public record Layout(int weight, LegacyHubLayout layout) {
+        private static final Codec<LegacyHubLayout> LAYOUT_CODEC = LegacyHubLayout.CODEC;
+    *///?}
         public static final Codec<Layout> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.intRange(1, 1000).fieldOf("weight").forGetter(Layout::weight),
-                JigsawStructure.CODEC.codec().fieldOf("layout").forGetter(Layout::layout)
+                LAYOUT_CODEC.fieldOf("layout").forGetter(Layout::layout)
         ).apply(instance, Layout::new));
     }
 
     public static final MapCodec<ComplexHub> CODEC = RecordCodecBuilder.<ComplexHub>mapCodec(instance -> instance.group(
             settingsCodec(instance),
-            Layout.CODEC.listOf(1, 8).fieldOf("layouts").forGetter(hub -> hub.layouts),
+            Layout.CODEC.listOf().fieldOf("layouts").forGetter(hub -> hub.layouts),
             Codec.STRING.fieldOf("family").forGetter(ComplexHub::family),
             Codec.STRING.fieldOf("size_class").forGetter(ComplexHub::sizeClass),
             GroundCheck.CODEC.optionalFieldOf("ground_check").forGetter(hub -> hub.groundCheck)
-    ).apply(instance, ComplexHub::new)).validate(hub -> {
+    ).apply(instance, ComplexHub::new)).flatXmap(ComplexHub::validateHub, ComplexHub::validateHub);
+
+    private static DataResult<ComplexHub> validateHub(ComplexHub hub) {
+        if (hub.layouts.isEmpty() || hub.layouts.size() > 8) {
+            return DataResult.error(() -> "A complex hub needs 1 to 8 layouts");
+        }
         if (!SatelliteLayout.validFamily(hub.family)
                 || !(hub.sizeClass.equals("outpost") || hub.sizeClass.equals("complex") || hub.sizeClass.equals("citadel"))) {
             return DataResult.error(() -> "Invalid complex family or size class");
         }
         return DataResult.success(hub);
-    });
+    }
 
     private final List<Layout> layouts;
     private final int[] weights;

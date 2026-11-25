@@ -150,7 +150,7 @@ public final class GalleryCommands {
             if (!NeroRuinsCommon.MOD_ID.equals(BuiltInRegistries.ITEM.getKey(item).getNamespace())) continue;
             ItemStack stack = new ItemStack(item);
             if (item == ModItems.DATA_SHARD.get() && !LogCatalog.ids().isEmpty()) {
-                stack.set(ModItems.LOG_ID.get(), LogCatalog.ids().get(0));
+                za.co.neroland.neroruins.item.DataShardItem.setLogId(stack, LogCatalog.ids().get(0));
             }
             items.add(stack);
         }

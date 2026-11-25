@@ -126,6 +126,7 @@ dependencies {
 // Run & Debug works — while values stay dynamic (sourced from gradle.properties).
 def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     def props = [
+        java_version: project.javaRelease,
         mod_id               : rootProject.mod_id,
         mod_version          : rootProject.mod_version,
         mod_name             : rootProject.mod_name,

@@ -44,7 +44,11 @@ class ExpeditionSnapshotTest {
     void roundTripsOverTheWire() {
         var snapshot = ExpeditionSnapshot.of(List.of(found(2, Optional.of(new ExpeditionRecord.Hub(-12, 4, 33))),
                 found(1, Optional.empty())));
+        //? if >=1.20.5 {
         var buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), RegistryAccess.EMPTY);
+        //?} else {
+        /*var buf = new net.minecraft.network.FriendlyByteBuf(Unpooled.buffer());
+        *///?}
         ExpeditionSnapshot.CODEC.encode(buf, snapshot);
         assertEquals(snapshot, ExpeditionSnapshot.CODEC.decode(buf));
     }

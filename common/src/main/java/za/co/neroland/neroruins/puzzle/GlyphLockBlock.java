@@ -67,7 +67,12 @@ public final class GlyphLockBlock extends BaseEntityBlock {
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new GlyphLockBlockEntity(pos, state); }
 
     @Override
+    //? if >=1.20.5 {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    //?} else {
+    /*public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+    *///?}
         if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer
                 && level.getBlockEntity(pos) instanceof GlyphLockBlockEntity lock) {
             return MenuOpener.openOrConsume(serverPlayer, lock);

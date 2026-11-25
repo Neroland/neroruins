@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.WeakHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
@@ -22,9 +23,16 @@ import za.co.neroland.neroruins.NeroRuinsCommon;
 import za.co.neroland.neroruins.worldgen.placement.SatellitePlacement;
 
 public final class SatelliteStructure extends Structure {
+    private static final Codec<JigsawStructure> LAYOUT_CODEC =
+        //? if >=1.20.5 {
+            JigsawStructure.CODEC.codec();
+        //?} else {
+        /*JigsawStructure.CODEC;
+        *///?}
+
     public static final MapCodec<SatelliteStructure> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group(
             settingsCodec(instance),
-            JigsawStructure.CODEC.codec().fieldOf("layout").forGetter(satellite -> satellite.layout),
+            LAYOUT_CODEC.fieldOf("layout").forGetter(satellite -> satellite.layout),
             SatellitePlacement.CODEC.codec().fieldOf("placement").forGetter(satellite -> satellite.placement)
     ).apply(instance, SatelliteStructure::new));
 

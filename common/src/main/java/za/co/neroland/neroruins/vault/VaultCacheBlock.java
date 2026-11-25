@@ -36,7 +36,12 @@ public final class VaultCacheBlock extends BaseEntityBlock {
     protected RenderShape getRenderShape(BlockState state) { return RenderShape.MODEL; }
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) { return new VaultCacheBlockEntity(pos, state); }
 
+    //? if >=1.20.5 {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    //?} else {
+    /*public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+    *///?}
         if (!level.isClientSide() && player instanceof ServerPlayer serverPlayer
                 && level.getBlockEntity(pos) instanceof VaultCacheBlockEntity cache) {
             return MenuOpener.openOrConsume(serverPlayer, cache);

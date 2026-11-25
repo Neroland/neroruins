@@ -96,7 +96,9 @@ public final class PlayerArchive extends SavedData {
                 Codec.STRING.fieldOf("player").forGetter(Entry::player),
                 Codec.STRING.fieldOf("log").forGetter(Entry::log),
                 Codec.LONG.fieldOf("read_at").forGetter(Entry::readAt)
-        ).apply(instance, Entry::new)).validate(entry -> {
+        ).apply(instance, Entry::new)).flatXmap(Entry::validateEntry, Entry::validateEntry);
+
+        private static DataResult<Entry> validateEntry(Entry entry) {
             try {
                 UUID.fromString(entry.player);
             } catch (IllegalArgumentException failure) {
@@ -104,7 +106,7 @@ public final class PlayerArchive extends SavedData {
             }
             return validLogId(entry.log) && entry.readAt >= 0
                     ? DataResult.success(entry) : DataResult.error(() -> "Invalid archive entry");
-        });
+        }
     }
 
     public static Codec<PlayerArchive> codec() {

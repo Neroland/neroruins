@@ -1,15 +1,16 @@
 package za.co.neroland.neroruins.worldgen.structure;
 
+import za.co.neroland.neroruins.data.CodecChecks;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 public record GroundCheck(int radius, int maxHeightDelta, boolean requireDry, int minDepth, int headroom) {
     public static final Codec<GroundCheck> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            Codec.intRange(1, 64).fieldOf("radius").forGetter(GroundCheck::radius),
-            Codec.intRange(0, 64).fieldOf("max_height_delta").forGetter(GroundCheck::maxHeightDelta),
-            Codec.BOOL.optionalFieldOf("require_dry", true).forGetter(GroundCheck::requireDry),
-            Codec.intRange(0, 128).optionalFieldOf("min_depth", 0).forGetter(GroundCheck::minDepth),
-            Codec.intRange(0, 128).optionalFieldOf("headroom", 0).forGetter(GroundCheck::headroom)
+            CodecChecks.intRange(1, 64).fieldOf("radius").forGetter(GroundCheck::radius),
+            CodecChecks.intRange(0, 64).fieldOf("max_height_delta").forGetter(GroundCheck::maxHeightDelta),
+            CodecChecks.optionalField(Codec.BOOL, "require_dry", true).forGetter(GroundCheck::requireDry),
+            CodecChecks.optionalField(CodecChecks.intRange(0, 128), "min_depth", 0).forGetter(GroundCheck::minDepth),
+            CodecChecks.optionalField(CodecChecks.intRange(0, 128), "headroom", 0).forGetter(GroundCheck::headroom)
     ).apply(instance, GroundCheck::new));
 
     public GroundCheck {

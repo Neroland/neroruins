@@ -85,7 +85,12 @@ public final class ConduitBlock extends Block {
     }
 
     @Override
+    //? if >=1.20.5 {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    //?} else {
+    /*public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+    *///?}
         if (level instanceof ServerLevel server && player instanceof ServerPlayer serverPlayer) {
             if (isLocked(server, pos)) return InteractionResult.CONSUME;
             server.setBlock(pos, state.setValue(FACING, state.getValue(FACING).getClockWise()), Block.UPDATE_ALL);

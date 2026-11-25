@@ -54,7 +54,12 @@ public final class ResonancePylonBlock extends Block {
     }
 
     @Override
+    //? if >=1.20.5 {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+    //?} else {
+    /*public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player,
+            net.minecraft.world.InteractionHand hand, BlockHitResult hit) {
+    *///?}
         if (level instanceof ServerLevel server && player instanceof ServerPlayer serverPlayer) {
             List<ResonanceTuning.Pylon> room = room(server, pos);
             if (ResonanceTuning.solved(room)) return InteractionResult.CONSUME;

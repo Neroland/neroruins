@@ -75,13 +75,21 @@ public final class SealedDoorBlock extends Block {
     }
 
     @Override
+    //? if >=1.20.3 {
     public BlockState playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    //?} else {
+    /*public void playerWillDestroy(Level level, BlockPos pos, BlockState state, Player player) {
+    *///?}
         BlockPos other = state.getValue(HALF) == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
         if (level.getBlockState(other).getBlock() == this) {
             level.setBlock(other, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),
                     Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
         }
+        //? if >=1.20.3 {
         return super.playerWillDestroy(level, pos, state, player);
+        //?} else {
+        /*super.playerWillDestroy(level, pos, state, player);
+        *///?}
     }
 
     @Override
