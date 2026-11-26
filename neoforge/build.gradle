@@ -15,7 +15,7 @@ def mc = stonecutter.current.version
 def neoVersion = project.findProperty("neo_version_${mc}")
 def jeiVersion = project.findProperty("jei_version_${mc}")
 def emiFile = project.findProperty("emi_file_neoforge_${mc}")
-def nerolandcoreVersion = project.findProperty('nerolandcore_version')
+def nerolandcoreVersion = rootProject.property('nerolandcore_version')
 // Minecraft range: 1.21.x cells are bounded to their API line (gradle.properties); 26.x keep [mc,).
 def mcCeiling = project.findProperty("mc_ceiling_${mc}")
 def mcFloor = project.findProperty("mc_floor_${mc}") ?: mc
@@ -111,7 +111,10 @@ dependencies {
 // neoForge.ideSyncTask runs this on IDE sync so bin/main gets the EXPANDED manifest
 // and Run & Debug works — values stay dynamic (from gradle.properties).
 def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    def legacyMetadata = stonecutter.eval(mc, '<1.20.4')
     def props = [
+        mod_mixin_entry       : legacyMetadata ? '' : '[[mixins]]\nconfig = "neroruins-common.mixins.json"',
+        required_dependency   : legacyMetadata ? 'mandatory = true' : 'type = "required"',
         mod_id                 : rootProject.mod_id,
         mod_version            : rootProject.mod_version,
         mod_name               : rootProject.mod_name,
@@ -136,6 +139,38 @@ def generateModMetadata = tasks.register('generateModMetadata', ProcessResources
     into layout.buildDirectory.dir('generated/sources/modMetadata')
 }
 sourceSets.main.resources.srcDir generateModMetadata
+
+if (stonecutter.eval(mc, '<1.20.4')) {
+    tasks.named('jar', Jar) {
+        manifest.attributes('MixinConfigs': 'neroruins-common.mixins.json')
+    }
+}
+
+
+// NeoForge 20.5's POM predates the ModDevGradle variants. The original userdev jar supplies the
+// game patches and the original POM supplies dependencies for the compile and test classpaths.
+if (mc in ['1.20.2', '1.20.3', '1.20.5']) {
+    dependencies.components.withModule('net.neoforged:neoforge') { details ->
+        if (details.id.version == neoVersion) {
+            details.withVariant('sources') {
+                withDependencies { clear() }
+            }
+            details.addVariant('legacyModDevBundle') {
+                withCapabilities { addCapability('net.neoforged', 'neoforge-moddev-bundle', neoVersion) }
+                withFiles { addFile("neoforge-${neoVersion}-userdev.jar") }
+            }
+            ['compile', 'runtime'].each { pomVariant ->
+                details.addVariant("legacyModDev-${pomVariant}", pomVariant) {
+                    withCapabilities {
+                        removeCapability('net.neoforged', 'neoforge')
+                        addCapability('net.neoforged', 'neoforge-dependencies', neoVersion)
+                    }
+                    withFiles { removeAllFiles() }
+                }
+            }
+        }
+    }
+}
 
 neoForge {
     version = neoVersion

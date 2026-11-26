@@ -17,8 +17,6 @@ import java.util.regex.Pattern;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtAccounter;
-import net.minecraft.nbt.NbtIo;
 import org.junit.jupiter.api.Test;
 import za.co.neroland.neroruins.guardian.SpawnTable;
 import za.co.neroland.neroruins.lore.LogCatalog;
@@ -39,7 +37,7 @@ class HalcyonArkTest {
     private CompoundTag template(String name) throws Exception {
         try (var input = getClass().getResourceAsStream(TestResources.path("/data/neroruins/structure/" + name + ".nbt"))) {
             assertNotNull(input, name);
-            return NbtIo.readCompressed(input, NbtAccounter.unlimitedHeap());
+            return TestResources.readCompressed(input);
         }
     }
 

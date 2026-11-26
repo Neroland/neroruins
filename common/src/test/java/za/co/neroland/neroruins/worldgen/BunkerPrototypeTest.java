@@ -10,8 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 
 import com.google.gson.JsonParser;
-import net.minecraft.nbt.NbtAccounter;
-import net.minecraft.nbt.NbtIo;
 import org.junit.jupiter.api.Test;
 import za.co.neroland.neroruins.lore.LogCatalog;
 import za.co.neroland.neroruins.TestResources;
@@ -37,7 +35,7 @@ class BunkerPrototypeTest {
                     try (var template = getClass().getResourceAsStream(TestResources.path("/data/neroruins/structure/"
                             + location.substring("neroruins:".length()) + ".nbt"))) {
                         assertNotNull(template, location);
-                        var nbt = NbtIo.readCompressed(template, NbtAccounter.unlimitedHeap());
+                        var nbt = TestResources.readCompressed(template);
                         assertTrue(nbt.get("blocks").toString().contains("minecraft:jigsaw"));
                     }
                 }

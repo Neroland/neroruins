@@ -2,9 +2,11 @@
 
 > Part of the Neroland sci-fi Minecraft mod ecosystem, built on **Neroland Core**.
 
-**Status:** beta — version `0.7.1`. Six ruin families with puzzles, guardians, per-player vaults,
-relics, data logs and expedition tools. Requires **Neroland Core 1.23.0**; most ruins generate on
+**Status:** beta — version `0.7.2`. Six ruin families with puzzles, guardians, per-player vaults,
+relics, data logs and expedition tools. Requires **Neroland Core 1.24.0**; most ruins generate on
 **Nerospace**'s worlds. Player documentation lives in the [wiki](wiki/Home.md).
+
+The Minecraft 1.20.3 and 1.20.5 builds use NeoForge 20.3.8-beta and 20.5.21-beta, respectively.
 
 ## Features
 
@@ -25,7 +27,7 @@ relics, data logs and expedition tools. Requires **Neroland Core 1.23.0**; most 
 
 - **Minecraft:** 1.21.1, 1.21.4, 1.21.5, 1.21.8 (also 1.21.7), 1.21.10 (also 1.21.9), 1.21.11, 26.1.2, 26.2 and 26.3
 - **Minecraft 1.20 builds:** 1.20 through 1.20.6 on Fabric,
-  1.20 through 1.20.4 and 1.20.6 on Forge, and 1.20.4 and 1.20.6 on NeoForge
+  1.20 through 1.20.2 through 1.20.6 on Forge, and 1.20.2 through 1.20.6 on NeoForge
 - **Loaders:** NeoForge, MinecraftForge/Forge, Fabric (42 build targets)
 - **Java:** 17 for 1.20 through 1.20.4, 21 for 1.20.5 through 1.21.x,
   and 25 for 26.x

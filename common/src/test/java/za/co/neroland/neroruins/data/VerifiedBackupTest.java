@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.UncheckedIOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtIo;
@@ -18,13 +19,17 @@ class VerifiedBackupTest {
         expected.putString("state", "erased");
         CompoundTag wrapper = new CompoundTag();
         wrapper.put("data", expected.copy());
-        NbtIo.writeCompressed(wrapper, file);
+        try (var output = Files.newOutputStream(file)) {
+            NbtIo.writeCompressed(wrapper, output);
+        }
         assertDoesNotThrow(() -> VerifiedBackup.verify(file, expected));
 
         CompoundTag stale = new CompoundTag();
         stale.putString("state", "before erasure");
         wrapper.put("data", stale);
-        NbtIo.writeCompressed(wrapper, file);
+        try (var output = Files.newOutputStream(file)) {
+            NbtIo.writeCompressed(wrapper, output);
+        }
         assertThrows(IllegalStateException.class, () -> VerifiedBackup.verify(file, expected));
         assertThrows(UncheckedIOException.class, () -> VerifiedBackup.verify(directory.resolve("missing.dat"), expected));
     }

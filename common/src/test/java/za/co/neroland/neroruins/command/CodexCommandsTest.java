@@ -14,6 +14,14 @@ import net.minecraft.commands.CommandSourceStack;
 import org.junit.jupiter.api.Test;
 
 class CodexCommandsTest {
+    //? if <1.20.3 {
+    /*@org.junit.jupiter.api.BeforeAll
+    static void bootstrapMinecraft() {
+        net.minecraft.SharedConstants.tryDetectVersion();
+        net.minecraft.server.Bootstrap.bootStrap();
+    }
+    *///?}
+
     @Test
     void acceptsNamespacedLogAndChapterArguments() {
         CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>();

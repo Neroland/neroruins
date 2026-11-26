@@ -5,17 +5,19 @@ generation ship, crashed freighters and the temples of the vanished Architects. 
 explore, guardians, a puzzle gate, a vault and data logs that tell one story across nine chapters.
 
 The Minecraft 1.20 series is supported on Fabric from 1.20 through 1.20.6, Forge from 1.20
-through 1.20.4 and on 1.20.6, and NeoForge on 1.20.4 and 1.20.6.
+through 1.20.4 and on 1.20.6, and NeoForge on 1.20.2 through 1.20.6.
 
 > **Status: 0.7.1.** Everything on these pages is in the mod and covered by automated tests, but
 > most structures have not yet been played through end to end in survival. Please report anything that
 > breaks.
 
+The Minecraft 1.20.3 and 1.20.5 builds use NeoForge 20.3.8-beta and 20.5.21-beta, respectively.
+
 ## Requirements
 
 - **Minecraft** 1.20 releases listed above, plus 1.21.1–1.21.11, 26.1.2, 26.2 or
   26.3 on NeoForge, Forge or Fabric.
-- **Neroland Core 1.23.0 or later** (below 2.0), on the same loader and
+- **Neroland Core 1.24.0 or later** (below 2.0), on the same loader and
   Minecraft release.
 - **Nerospace** (optional, but needed for most ruins): every family except the Earth bunker generates on
   Nerospace's moons and planets, and the Halcyon Ark generates in its station dimension. Without

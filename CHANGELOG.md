@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.7.2]
+
+### Added
+
+- Minecraft 1.20.2, 1.20.3 and 1.20.5 on NeoForge, with Neroland Core 1.24.0 or newer.
+
 ## [0.7.1] - 2026-11-25
 
 - Java 17 builds for Minecraft 1.20 through 1.20.4 on Fabric and Forge,

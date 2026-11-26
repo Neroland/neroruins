@@ -18,8 +18,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtAccounter;
-import net.minecraft.nbt.NbtIo;
 import org.junit.jupiter.api.Test;
 import za.co.neroland.neroruins.lore.LogCatalog;
 import za.co.neroland.neroruins.worldgen.structure.GroundCheck;
@@ -44,7 +42,7 @@ class SurveyLabTest {
         try (var input = getClass().getResourceAsStream(TestResources.path("/data/neroruins/structure/"
                 + location.substring("neroruins:".length()) + ".nbt"))) {
             assertNotNull(input, location);
-            return NbtIo.readCompressed(input, NbtAccounter.unlimitedHeap());
+            return TestResources.readCompressed(input);
         }
     }
 

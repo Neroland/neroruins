@@ -13,8 +13,6 @@ import java.util.HashSet;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
-import net.minecraft.nbt.NbtAccounter;
-import net.minecraft.nbt.NbtIo;
 import org.junit.jupiter.api.Test;
 import za.co.neroland.neroruins.lore.LogCatalog;
 import za.co.neroland.neroruins.worldgen.placement.SatelliteLayout;
@@ -58,7 +56,7 @@ class CrashSiteTest {
                     try (var template = getClass().getResourceAsStream(TestResources.path("/data/neroruins/structure/"
                             + location.substring("neroruins:".length()) + ".nbt"))) {
                         assertNotNull(template, location);
-                        var nbt = NbtIo.readCompressed(template, NbtAccounter.unlimitedHeap());
+                        var nbt = TestResources.readCompressed(template);
                         assertTrue(nbt.get("blocks").toString().contains("neroruins:vault_cache"));
                     }
                 }
@@ -129,7 +127,7 @@ class CrashSiteTest {
             try (var template = getClass().getResourceAsStream(TestResources.path("/data/neroruins/structure/crash_site_meridian_"
                     + variant + ".nbt"))) {
                 assertNotNull(template);
-                String blocks = NbtIo.readCompressed(template, NbtAccounter.unlimitedHeap()).get("blocks").toString();
+                String blocks = TestResources.readCompressed(template).get("blocks").toString();
                 for (int n = 1; n <= 6; n++) {
                     String id = "neroruins:cindara." + n;
                     assertTrue(blocks.contains(id), variant + " is missing " + id);
