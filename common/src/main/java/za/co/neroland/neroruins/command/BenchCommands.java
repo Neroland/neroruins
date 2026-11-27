@@ -117,7 +117,7 @@ public final class BenchCommands {
             //? if >=26.3 {
             StructureStart start = structure.value().generate(structure, level.dimension(), level.registryAccess(),
                     generator, generator.getBiomeSource(), sampler, randomState, templates, seed, chunk, 0, level, biomes);
-            //?} else if >=1.21.2 {
+            //?} else if >=1.21.4 {
             /*StructureStart start = structure.value().generate(structure, level.dimension(), level.registryAccess(),
                     generator, generator.getBiomeSource(), randomState, templates, seed, chunk, 0, level, biomes);
             *///?} else {

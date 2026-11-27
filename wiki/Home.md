@@ -5,7 +5,8 @@ generation ship, crashed freighters and the temples of the vanished Architects. 
 explore, guardians, a puzzle gate, a vault and data logs that tell one story across nine chapters.
 
 The Minecraft 1.20 series is supported on Fabric from 1.20 through 1.20.6, Forge from 1.20
-through 1.20.4 and on 1.20.6, and NeoForge on 1.20.2 through 1.20.6.
+through 1.20.4 and on 1.20.6, and NeoForge on 1.20.2 through 1.20.6. Later builds cover 1.21.1, 1.21.3, 1.21.4,
+1.21.5, 1.21.8, 1.21.10, 1.21.11, 26.1, 26.1.1, 26.1.2, 26.2 and 26.3 on all three loaders.
 
 > **Status: 0.7.1.** Everything on these pages is in the mod and covered by automated tests, but
 > most structures have not yet been played through end to end in survival. Please report anything that

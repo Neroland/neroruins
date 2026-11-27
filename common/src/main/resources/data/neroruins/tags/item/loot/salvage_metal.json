@@ -16,15 +16,15 @@
       "required": false
     },
     {
-      "id": "nerospace:raw_nerosium",
+      "id": "nerolandcore:raw_nerosium",
       "required": false
     },
     {
-      "id": "nerospace:raw_hematite",
+      "id": "nerolandcore:raw_hematite",
       "required": false
     },
     {
-      "id": "nerospace:raw_ilmenite",
+      "id": "nerolandcore:raw_ilmenite",
       "required": false
     },
     {

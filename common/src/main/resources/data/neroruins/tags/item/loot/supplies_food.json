@@ -6,7 +6,7 @@
     "minecraft:dried_kelp",
     "minecraft:cookie",
     {
-      "id": "nerospace:moon_cheese",
+      "id": "nerolandcore:moon_cheese",
       "required": false
     },
     {

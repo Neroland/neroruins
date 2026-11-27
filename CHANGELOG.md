@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-27
+
+### Added
+
+- Builds for Minecraft 1.21.3, 26.1 and 26.1.1 on Fabric, Forge and NeoForge, matching Neroland Core's cells.
+
+### Changed
+
+- The salvage-metal and supplies-food loot tags name the Neroland Core items (`nerolandcore:`), since
+  every Nero ore and its raw material moved to Core 1.25.0.
+- Requires Neroland Core 1.25.0 or newer.
+
 ## [0.7.2]
 
 ### Added

@@ -17,8 +17,9 @@
   `za.co.neroland.neroruins`. Author: **Neroland**.
 - Version: **0.4.1-alpha.1**.
 - **Development and runtime acceptance target: MC 26.3** on all three loaders.
-- Targets **MC 1.21.1, 1.21.4, 1.21.5, 1.21.8, 1.21.10, 1.21.11, 26.1.2, 26.2 AND 26.3** on **NeoForge,
-  MinecraftForge/Forge, and Fabric** → the **"27 cells"**. **Java 21** for 1.21.x, **Java 25** for 26.x.
+- Targets **MC 1.20 through 26.3** (`mc_versions`) on **NeoForge (1.20.2+), MinecraftForge/Forge (all but 1.20.5), and
+  Fabric** → **54 cells**, the same matrix as Neroland Core. **Java 17** for 1.20-1.20.4, **Java 21** for
+  1.20.5-1.21.x, **Java 25** for 26.x.
   Mappings = official Mojang names (26.x ships de-obfuscated; 1.21.x Fabric is remapped). Source is written
   for 26.x; older lines use `//?` blocks and the `legacyRenames` list in `stonecutter.gradle`.
 
