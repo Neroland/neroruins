@@ -10,6 +10,14 @@
       "required": false
     },
     {
+      "id": "nerospace:suit_helmet",
+      "required": false
+    },
+    {
+      "id": "nerospace:suit_boots",
+      "required": false
+    },
+    {
       "id": "nerospace:oxygen_suit_helmet",
       "required": false
     },

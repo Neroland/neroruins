@@ -2,7 +2,7 @@
 
 > Part of the Neroland sci-fi Minecraft mod ecosystem, built on **Neroland Core**.
 
-**Status:** beta — version `0.8.0`. Six ruin families with puzzles, guardians, per-player vaults,
+**Status:** beta — version `0.8.1`. Six ruin families with puzzles, guardians, per-player vaults,
 relics, data logs and expedition tools. Requires **Neroland Core 1.24.0**; most ruins generate on
 **Nerospace**'s worlds. Player documentation lives in the [wiki](wiki/Home.md).
 

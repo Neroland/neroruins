@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-11-28
+
+### Changed
+
+- Oxygen-supply caches in ruins can now hold Nerospace's Pathfinder Suit helmet and boots. The older
+  oxygen-suit pieces and the radiation lining can still turn up, so nothing changes for worlds on an
+  older Nerospace, and none of these appear when Nerospace is not installed.
+
 ## [0.8.0] - 2026-11-27
 
 ### Added
